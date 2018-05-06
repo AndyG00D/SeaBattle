@@ -1,3 +1,5 @@
+'use strict';
+
 // A* Pathfinding for HTML5 Canvas Tutorial
 // by Christer (McFunkypants) Kaitila
 // http://www.mcfunkypants.com
@@ -11,35 +13,35 @@
 // way you like, commercial or otherwise. Enjoy!
 
 // the game's canvas element
-var canvas = null;
+let canvas = null;
 // the canvas 2d context
-var ctx = null;
+let ctx = null;
 // an image containing all sprites
-var spritesheet = null;
+let spritesheet = null;
 // true when the spritesheet has been downloaded
-var spritesheetLoaded = false;
+let spritesheetLoaded = false;
 
 // the world grid: a 2d array of tiles
-var world = [[]];
+let world = [[]];
 
 // size in the world in sprite tiles
-var worldWidth = 10;
-var worldHeight = 10;
+let worldWidth = 10;
+let worldHeight = 10;
 
 // size of a tile in pixels
-var tileWidth = 32;
-var tileHeight = 32;
+let tileWidth = 32;
+let tileHeight = 32;
 
 // start and end of path
-var pathStart = [worldWidth, worldHeight];
-var pathEnd = [0, 0];
-var currentPath = [];
+let pathStart = [worldWidth, worldHeight];
+let pathEnd = [0, 0];
+let currentPath = [];
 
 // ensure that concole.log doesn't cause errors
-if (typeof console == "undefined") var console = {
-    log: function () {
-    }
-};
+// if (typeof console == "undefined") console = {
+//     log: function () {
+//     }
+// };
 
 // the html page is ready
 function onload() {
@@ -76,17 +78,17 @@ function createWorld() {
     console.log('Creating world...');
 
     // create emptiness
-    for (var x = 0; x < worldWidth; x++) {
+    for (let x = 0; x < worldWidth; x++) {
         world[x] = [];
 
-        for (var y = 0; y < worldHeight; y++) {
+        for (let y = 0; y < worldHeight; y++) {
             world[x][y] = 0;
         }
     }
 
     // scatter some walls
-    for (var x = 0; x < worldWidth; x++) {
-        for (var y = 0; y < worldHeight; y++) {
+    for (let x = 0; x < worldWidth; x++) {
+        for (let y = 0; y < worldHeight; y++) {
             if (Math.random() > 0.75)
                 world[x][y] = 1;
         }
@@ -119,14 +121,14 @@ function redraw() {
 
     console.log('redrawing...');
 
-    var spriteNum = 0;
+    // let spriteNum = 0;
 
     // clear the screen
     ctx.strokeStyle = '#000000';
     ctx.strokeRect(0, 0, canvas.width, canvas.height);
 
-    for (var x = 0; x < worldWidth; x++) {
-        for (var y = 0; y < worldHeight; y++) {
+    for (let x = 0; x < worldWidth; x++) {
+        for (let y = 0; y < worldHeight; y++) {
 
             // choose a sprite to draw
             switch (world[x][y]) {
@@ -159,7 +161,7 @@ function redraw() {
 
     // draw the path
     console.log('Current path length: ' + currentPath.length);
-    for (rp = 0; rp < currentPath.length; rp++) {
+    for (let rp = 0; rp < currentPath.length; rp++) {
         switch (rp) {
             case 0:
                 // spriteNum = 2; // start
@@ -189,8 +191,8 @@ function redraw() {
 
 // handle click events on the canvas
 function fieldClick(e) {
-    var x;
-    var y;
+    let x;
+    let y;
 
     // grab html page coords
     if (e.pageX != undefined && e.pageY != undefined) {
@@ -209,7 +211,7 @@ function fieldClick(e) {
     y -= canvas.offsetTop;
 
     // return tile x,y that we clicked
-    var cell =
+    let cell =
         [
             Math.floor(x / tileWidth),
             Math.floor(y / tileHeight)
@@ -273,29 +275,29 @@ function canvasClick(e) {
 // pathStart and pathEnd are arrays like [5,10]
 function findPath(world, pathStart, pathEnd) {
     // shortcuts for speed
-    var abs = Math.abs;
-    var max = Math.max;
-    var pow = Math.pow;
-    var sqrt = Math.sqrt;
+    let abs = Math.abs;
+    let max = Math.max;
+    let pow = Math.pow;
+    let sqrt = Math.sqrt;
 
     // the world data are integers:
     // anything higher than this number is considered blocked
     // this is handy is you use numbered sprites, more than one
     // of which is walkable road, grass, mud, etc
-    var maxWalkableTileNum = 0;
+    let maxWalkableTileNum = 0;
 
     // keep track of the world dimensions
     // Note that this A-star implementation expects the world array to be square:
     // it must have equal height and width. If your game world is rectangular,
     // just fill the array with dummy values to pad the empty space.
-    var worldWidth = world[0].length;
-    var worldHeight = world.length;
-    var worldSize = worldWidth * worldHeight;
+    let worldWidth = world[0].length;
+    let worldHeight = world.length;
+    let worldSize = worldWidth * worldHeight;
 
     // which heuristic should we use?
     // default: no diagonals (Manhattan)
-    var distanceFunction = ManhattanDistance;
-    var findNeighbours = function () {
+    let distanceFunction = ManhattanDistance;
+    let findNeighbours = function () {
     }; // empty
 
     /*
@@ -303,20 +305,20 @@ function findPath(world, pathStart, pathEnd) {
     // alternate heuristics, depending on your game:
 
     // diagonals allowed but no sqeezing through cracks:
-    var distanceFunction = DiagonalDistance;
-    var findNeighbours = DiagonalNeighbours;
+    let distanceFunction = DiagonalDistance;
+    let findNeighbours = DiagonalNeighbours;
 
     // diagonals and squeezing through cracks allowed:
-    var distanceFunction = DiagonalDistance;
-    var findNeighbours = DiagonalNeighboursFree;
+    let distanceFunction = DiagonalDistance;
+    let findNeighbours = DiagonalNeighboursFree;
 
     // euclidean but no squeezing through cracks:
-    var distanceFunction = EuclideanDistance;
-    var findNeighbours = DiagonalNeighbours;
+    let distanceFunction = EuclideanDistance;
+    let findNeighbours = DiagonalNeighbours;
 
     // euclidean and squeezing through cracks allowed:
-    var distanceFunction = EuclideanDistance;
-    var findNeighbours = DiagonalNeighboursFree;
+    let distanceFunction = EuclideanDistance;
+    let findNeighbours = DiagonalNeighboursFree;
 
     */
 
@@ -344,7 +346,7 @@ function findPath(world, pathStart, pathEnd) {
     // cell that is empty. No diagonals,
     // unless distanceFunction function is not Manhattan
     function Neighbours(x, y) {
-        var N = y - 1,
+        let N = y - 1,
             S = y + 1,
             E = x + 1,
             W = x - 1,
@@ -415,7 +417,7 @@ function findPath(world, pathStart, pathEnd) {
     // Node function, returns a new object with Node properties
     // Used in the calculatePath function to store route costs, etc.
     function Node(Parent, Point) {
-        var newNode = {
+        let newNode = {
             // pointer to another Node object
             Parent: Parent,
             // array index of this Node in the world linear array
@@ -437,29 +439,29 @@ function findPath(world, pathStart, pathEnd) {
     // Path function, executes AStar algorithm operations
     function calculatePath() {
         // create Nodes from the Start and End x,y coordinates
-        var mypathStart = Node(null, {x: pathStart[0], y: pathStart[1]});
-        var mypathEnd = Node(null, {x: pathEnd[0], y: pathEnd[1]});
+        let mypathStart = Node(null, {x: pathStart[0], y: pathStart[1]});
+        let mypathEnd = Node(null, {x: pathEnd[0], y: pathEnd[1]});
         // create an array that will contain all world cells
-        var AStar = new Array(worldSize);
+        let AStar = new Array(worldSize);
         // list of currently open Nodes
-        var Open = [mypathStart];
+        let Open = [mypathStart];
         // list of closed Nodes
-        var Closed = [];
+        let Closed = [];
         // list of the final output array
-        var result = [];
+        let result = [];
         // reference to a Node (that is nearby)
-        var myNeighbours;
+        let myNeighbours;
         // reference to a Node (that we are considering now)
-        var myNode;
+        let myNode;
         // reference to a Node (that starts a path in question)
-        var myPath;
+        let myPath;
         // temp integer variables used in the calculations
-        var length, max, min, i, j;
+        let length, max, min, i, j;
         // iterate through the open list until none are left
         while (length = Open.length) {
             max = worldSize;
             min = -1;
-            for (i = 0; i < length; i++) {
+            for (let i = 0; i < length; i++) {
                 if (Open[i].f < max) {
                     max = Open[i].f;
                     min = i;
@@ -484,7 +486,7 @@ function findPath(world, pathStart, pathEnd) {
                 // find which nearby nodes are walkable
                 myNeighbours = Neighbours(myNode.x, myNode.y);
                 // test each one that hasn't been tried already
-                for (i = 0, j = myNeighbours.length; i < j; i++) {
+                for (let i = 0, j = myNeighbours.length; i < j; i++) {
                     myPath = Node(myNode, myNeighbours[i]);
                     if (!AStar[myPath.value]) {
                         // estimated cost of this particular route so far
