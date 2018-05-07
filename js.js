@@ -25,16 +25,16 @@ let ctx = null;
 let maze = [[]];
 
 // size in the maze in sprite tiles
-let mazeWidth = 10;
-let mazeHeight = 10;
+let mazeWidth = 30;
+let mazeHeight = 30;
 
 // size of a tile in pixels
 let tileWidth = 32;
 let tileHeight = 32;
 
 // start and end of path
-let pathStart = [mazeWidth, mazeHeight];
-let pathEnd = [0, 0];
+// let pathStart = [mazeWidth, mazeHeight];
+// let pathEnd = [0, 0];
 let currentPath = [];
 
 // ensure that concole.log doesn't cause errors
@@ -214,9 +214,9 @@ function findClick() {
 // Node class, returns a new object with Node properties
 // Used in the _findPath function to store route costs, etc.
 class Node {
-    constructor(prevNode = null, Point = {x: 0, y: 0}) {
-        this.x = Point.x;
-        this.y = Point.y;
+    constructor(prevNode = null, position = {x: 0, y: 0}) {
+        this.x = position.x;
+        this.y = position.y;
         // pointer to another Node object
         this.prev = prevNode;
         if (!prevNode) {
@@ -226,9 +226,9 @@ class Node {
         } else {
 
             // array index of this Node in the maze linear array
-            // this.value = Point.x + (Point.y * mazeWidth);
+            // this.value = position.x + (position.y * mazeWidth);
             // the location coordinates of this Node
-            this.h = Math.abs(Point.x - prevNode.x) + Math.abs(Point.y - prevNode.y);
+            this.h = Math.abs(position.x - prevNode.x) + Math.abs(position.y - prevNode.y);
             // the distanceFunction cost to get
             // from the starting point to this node
             this.g = prevNode.g + this.h;
@@ -249,8 +249,8 @@ class Finder{
         this._mazeWidth = maze[0].length;
         this._mazeHeight = maze.length;
         this._mazeSize = this._mazeWidth * this._mazeHeight;
-        this._start = [this._mazeWidth - 1, this._mazeHeight - 1];
-        this._end = [0, 0];
+        this._end = [this._mazeWidth - 1, this._mazeHeight - 1];
+        // this._start = [0, 0];
     }
 
     // Returns every available North, South, East or West
@@ -277,14 +277,14 @@ class Finder{
 
     // returns boolean value (maze cell is available and open)
     _isEmpty(x, y) {
-        return this.maze[x][y] == 0;
+        return this.maze[x][y] === 0;
     };
 
 
     // Path function, executes AStar algorithm operations
     find() {
         // create Nodes from the Start and End x,y coordinates
-        let startNode = new Node(null, {x:this._mazeWidth - 1, y:this._mazeWidth - 1});
+        let startNode = new Node();
         // create an array that will contain all maze cells
         let route = new Array(this._mazeSize);
          // list of currently open Nodes
@@ -319,7 +319,7 @@ class Finder{
             // Вершина x пошла на обработку, а значит её следует удалить из очереди на обработку
             currentNode = Open.splice(min, 1)[0];
             // is it the destination node?
-            if ((currentNode.x === 0) && (currentNode.y === 0)) {
+            if ((currentNode.x === this._end[0]) && (currentNode.y === this._end[1])) {
                 nextNode = closed[closed.push(currentNode) - 1];
                 do {
                     result.push([nextNode.x, nextNode.y]);
@@ -337,16 +337,18 @@ class Finder{
                 for (let next of this._getNextNodes(currentNode.x, currentNode.y)) {
                     nextNode = new Node(currentNode, next);
                     //if (!route[next.x + (next.y * mazeWidth)]) {
-                    if (!route[next.x + (next.y * mazeWidth)]) {
+                    if (!route[next.x + (next.y * this._mazeWidth)]) {
                         Open.push(nextNode);
                         // mark this node in the maze graph as visited
-                        route[next.x + (next.y * mazeWidth)] = true;
+                        route[next.x + (next.y * this._mazeWidth)] = true;
                     }
+                    // console.log(route);
                 }
                 // remember this route as having no more untested options
                 closed.push(currentNode);
             }
         } // keep iterating until the Open list is empty
+        console.log("result :" + result);
         return result;
     }
 
