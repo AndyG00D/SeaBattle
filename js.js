@@ -97,8 +97,8 @@ function createMaze() {
     //     if (maze[pathStart[0]][pathStart[1]] == 0)
     //         currentPath = Finder(maze, pathStart, pathEnd);
     // }
-    pathStart = [0, 0];
-    pathEnd = [mazeWidth - 1, mazeHeight - 1];
+    //pathStart = [0, 0];
+    //pathEnd = [mazeWidth - 1, mazeHeight - 1];
     //currentPath = Finder(maze, pathStart, pathEnd);
     redraw();
 
@@ -139,15 +139,15 @@ function redraw() {
     for (let rp = 0; rp < currentPath.length; rp++) {
         switch (rp) {
             case 0:
-                // spriteNum = 2; // start
+                // start
                 ctx.fillStyle = '#00ff6e';
                 break;
             case currentPath.length - 1:
-                // spriteNum = 3; // end
+                // end
                 ctx.fillStyle = '#d72f2c';
                 break;
             default:
-                // spriteNum = 4; // path node
+                //path node
                 ctx.fillStyle = '#fff026';
                 break;
         }
@@ -205,52 +205,14 @@ function fieldClick(e) {
 // -------------------------------------------------------------------
 // handle click events on the canvas
 function findClick() {
-    currentPath = Finder(maze, pathStart, pathEnd);
-    redraw();
-}
-// -------------------------------------------------------------------
-// handle click events on the canvas
-function canvasClick(e) {
-    var x;
-    var y;
-
-    // grab html page coords
-    if (e.pageX != undefined && e.pageY != undefined) {
-        x = e.pageX;
-        y = e.pageY;
-    }
-    else {
-        x = e.clientX + document.body.scrollLeft +
-            document.documentElement.scrollLeft;
-        y = e.clientY + document.body.scrollTop +
-            document.documentElement.scrollTop;
-    }
-
-    // make them relative to the canvas only
-    x -= canvas.offsetLeft;
-    y -= canvas.offsetTop;
-
-    // return tile x,y that we clicked
-    var cell =
-        [
-            Math.floor(x / tileWidth),
-            Math.floor(y / tileHeight)
-        ];
-
-    // now we know while tile we clicked
-    console.log('we clicked tile ' + cell[0] + ',' + cell[1]);
-
-    pathStart = pathEnd;
-    pathEnd = cell;
-
-    // calculate path
-    currentPath = Finder(maze, pathStart, pathEnd);
+    let finderPath = new Finder(maze);
+    currentPath = finderPath.find();
     redraw();
 }
 
 
 // Node class, returns a new object with Node properties
-// Used in the calculatePath function to store route costs, etc.
+// Used in the _findPath function to store route costs, etc.
 class Node {
     constructor(prevNode = null, Point = {x: 0, y: 0}) {
         this.x = Point.x;
@@ -282,79 +244,50 @@ class Node {
 // maze is a 2d array of integers (eg maze[10][15] = 0)
 // pathStart and pathEnd are arrays like [5,10]
 class Finder{
-    constructor(maze, pathStart, pathEnd){
+    constructor(maze){
         this.maze = maze;
-        this.pathStart = pathStart;
-        this.pathEnd = pathEnd;
+        this._mazeWidth = maze[0].length;
+        this._mazeHeight = maze.length;
+        this._mazeSize = this._mazeWidth * this._mazeHeight;
+        this._start = [this._mazeWidth - 1, this._mazeHeight - 1];
+        this._end = [0, 0];
     }
-    // shortcuts for speed
-    // let abs = Math.abs;
-    // let max = Math.max;
-    // let pow = Math.pow;
-    // let sqrt = Math.sqrt;
-
-
-    // keep track of the maze dimensions
-    // Note that this A-star implementation expects the maze array to be square:
-    // it must have equal height and width. If your game maze is rectangular,
-    // just fill the array with dummy values to pad the empty space.
-    let mazeWidth = this.maze[0].length;
-    let mazeHeight = this.maze.length;
-    let mazeSize = this.mazeWidth * mazeHeight;
-
-    // which heuristic should we use?
-    // default: no diagonals (Manhattan)
-    // let distanceFunction = ManhattanDistance;
-
-
-    // distanceFunction functions
-    // these return how far away a point is to another
-
-    // function ManhattanDistance(Point, Goal) {	// linear movement - no diagonals - just cardinal directions (NSEW)
-    //     return Math.abs(Point.x - Goal.x) + Math.abs(Point.y - Goal.y);
-    //     // return 0;
-    // }
-
 
     // Returns every available North, South, East or West
     // cell that is empty. No diagonals,
     // unless distanceFunction function is not Manhattan
-    function getNextNodes(x, y) {
+    _getNextNodes(x, y) {
         let top = y - 1,
             bottom = y + 1,
             left = x + 1,
             right = x - 1,
             result = [];
         //стек top, left, bottom, right
-        if (top > -1 && isEmpty(x, top))
+        if (top > -1 && this._isEmpty(x, top))
             result.push({x: x, y: top});
-        if (left < mazeWidth && isEmpty(left, y))
+        if (left < this._mazeWidth && this._isEmpty(left, y))
             result.push({x: left, y: y});
-        if (bottom < mazeHeight && isEmpty(x, bottom))
+        if (bottom < this._mazeHeight && this._isEmpty(x, bottom))
             result.push({x: x, y: bottom});
-        if (right > -1 && isEmpty(right, y))
+        if (right > -1 && this._isEmpty(right, y))
             result.push({x: right, y: y});
         return result;
     }
 
 
     // returns boolean value (maze cell is available and open)
-    function isEmpty(x, y) {
-        // return ((maze[x] != null) &&
-        //     (maze[x][y] != null)
-        //      && (maze[x][y] <= 0));
+    _isEmpty(x, y) {
         return this.maze[x][y] == 0;
     };
 
 
     // Path function, executes AStar algorithm operations
-    function calculatePath() {
+    find() {
         // create Nodes from the Start and End x,y coordinates
-        let startNode = new Node();
+        let startNode = new Node(null, {x:this._mazeWidth - 1, y:this._mazeWidth - 1});
         // create an array that will contain all maze cells
-        let route = new Array(mazeSize);
-        console.log("Astar:" + route);
-        // list of currently open Nodes
+        let route = new Array(this._mazeSize);
+         // list of currently open Nodes
         // Множество вершин(очередь), которые предстоит обработать(раскрыть).
         // Изначально здесь присутствует только начальная вершина start.
         let Open = [];
@@ -374,7 +307,7 @@ class Finder{
         while (Open.length) {
 
             //ищем вершину из open имеющую самую низкую оценку f(x)
-            let max = mazeSize;
+            let max = this._mazeSize;
             let min = -1;
             for (let i in Open) {
                 if (Open[i].f < max) {
@@ -386,7 +319,7 @@ class Finder{
             // Вершина x пошла на обработку, а значит её следует удалить из очереди на обработку
             currentNode = Open.splice(min, 1)[0];
             // is it the destination node?
-            if ((currentNode.x === this.pathEnd[0]) && (currentNode.y === this.pathEnd[1])) {
+            if ((currentNode.x === 0) && (currentNode.y === 0)) {
                 nextNode = closed[closed.push(currentNode) - 1];
                 do {
                     result.push([nextNode.x, nextNode.y]);
@@ -401,7 +334,7 @@ class Finder{
             {
                 // find which nearby nodes are walkable
                 // test each one that hasn't been tried already
-                for (let next of getNextNodes(currentNode.x, currentNode.y)) {
+                for (let next of this._getNextNodes(currentNode.x, currentNode.y)) {
                     nextNode = new Node(currentNode, next);
                     //if (!route[next.x + (next.y * mazeWidth)]) {
                     if (!route[next.x + (next.y * mazeWidth)]) {
@@ -416,11 +349,6 @@ class Finder{
         } // keep iterating until the Open list is empty
         return result;
     }
-
-    // actually calculate the a-star path!
-    // this returns an array of coordinates
-    // that is empty if no path is possible
-    return calculatePath();
 
 } // end of Finder() function
 
