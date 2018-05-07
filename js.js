@@ -242,6 +242,37 @@ function canvasClick(e) {
     redraw();
 }
 
+
+// Node class, returns a new object with Node properties
+// Used in the calculatePath function to store route costs, etc.
+class Node {
+    constructor(prevNode = null, Point = {x: 0, y: 0}) {
+        this.x = Point.x;
+        this.y = Point.y;
+        // pointer to another Node object
+        this.prev = prevNode;
+        if (!prevNode) {
+            this.value = 0;
+            this.h = 0;
+            this.g = 0;
+            this.f = 0;
+        } else {
+
+            // array index of this Node in the maze linear array
+            // this.value = Point.x + (Point.y * mazeWidth);
+            // the location coordinates of this Node
+            this.h = Math.abs(Point.x - prevNode.x) + Math.abs(Point.y - prevNode.y);
+            // the distanceFunction cost to get
+            // from the starting point to this node
+            this.g = prevNode.g + this.h;
+            // the heuristic estimated cost
+            // of an entire path using this node
+            this.f = this.g + this.h;
+        }
+    }
+}
+
+
 // -------------------------------------------------------------------
 // maze is a 2d array of integers (eg maze[10][15] = 0)
 // pathStart and pathEnd are arrays like [5,10]
@@ -263,16 +294,16 @@ function findPath(maze, pathStart, pathEnd) {
 
     // which heuristic should we use?
     // default: no diagonals (Manhattan)
-    let distanceFunction = ManhattanDistance;
+    // let distanceFunction = ManhattanDistance;
 
 
     // distanceFunction functions
     // these return how far away a point is to another
 
-    function ManhattanDistance(Point, Goal) {	// linear movement - no diagonals - just cardinal directions (NSEW)
-        return Math.abs(Point.x - Goal.x) + Math.abs(Point.y - Goal.y);
-        // return 0;
-    }
+    // function ManhattanDistance(Point, Goal) {	// linear movement - no diagonals - just cardinal directions (NSEW)
+    //     return Math.abs(Point.x - Goal.x) + Math.abs(Point.y - Goal.y);
+    //     // return 0;
+    // }
 
 
     // Returns every available North, South, East or West
@@ -305,34 +336,12 @@ function findPath(maze, pathStart, pathEnd) {
         return maze[x][y] == 0;
     };
 
-    // Node function, returns a new object with Node properties
-    // Used in the calculatePath function to store route costs, etc.
-    function Node(prevNode, Point) {
-        let newNode = {
-            // pointer to another Node object
-            prev: prevNode,
-            // array index of this Node in the maze linear array
-            value: Point.x + (Point.y * mazeWidth),
-            // the location coordinates of this Node
-            x: Point.x,
-            y: Point.y,
-            // the heuristic estimated cost
-            // of an entire path using this node
-            // h: distanceFunction(prevNode, Point);
-            f: 0,
-            // the distanceFunction cost to get
-            // from the starting point to this node
-            g: 0
-        };
 
-        return newNode;
-    }
 
     // Path function, executes AStar algorithm operations
     function calculatePath() {
         // create Nodes from the Start and End x,y coordinates
-        let startNode = Node(null, {x: pathStart[0], y: pathStart[1]});
-        let endNode = Node(null, {x: pathEnd[0], y: pathEnd[1]});
+        let startNode = new Node();
         // create an array that will contain all maze cells
         let AStar = new Array(mazeSize);
         console.log("Astar:" + AStar);
@@ -368,7 +377,7 @@ function findPath(maze, pathStart, pathEnd) {
             // Вершина x пошла на обработку, а значит её следует удалить из очереди на обработку
             currentNode = Open.splice(min, 1)[0];
             // is it the destination node?
-            if ((currentNode.x === endNode.x) && (currentNode.y === endNode.y)) {
+            if ((currentNode.x === pathEnd[0]) && (currentNode.y === pathEnd[1])) {
                 nextNode = Closed[Closed.push(currentNode) - 1];
                 do {
                     result.push([nextNode.x, nextNode.y]);
@@ -384,17 +393,18 @@ function findPath(maze, pathStart, pathEnd) {
                 // find which nearby nodes are walkable
                 // test each one that hasn't been tried already
                 for (let next of nextFields(currentNode.x, currentNode.y)) {
-                    nextNode = Node(currentNode, next);
-                    if (!AStar[nextNode.value]) {
-                        console.log("Astar:" + AStar);
+                    nextNode = new Node(currentNode, next);
+                    if (!AStar[next.x + (next.y * mazeWidth)]) {
+                        // console.log("Astar:" + AStar);
                         // estimated cost of this particular route so far
-                        nextNode.g = currentNode.g + distanceFunction(currentNode, next);
+                        // nextNode.g = currentNode.g + distanceFunction(currentNode, next);
                         // estimated cost of entire guessed route to the destination
-                        nextNode.f = nextNode.g + distanceFunction(currentNode, next);
+                        // nextNode.f = nextNode.g + distanceFunction(currentNode, next);
                         // remember this new path for testing above
+                        console.log("nextNode:" + nextNode);
                         Open.push(nextNode);
                         // mark this node in the maze graph as visited
-                        AStar[nextNode.value] = true;
+                        AStar[next.x + (next.y * mazeWidth)] = true;
                     }
                 }
                 // remember this route as having no more untested options
