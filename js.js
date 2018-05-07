@@ -17,23 +17,23 @@ let canvas = null;
 // the canvas 2d context
 let ctx = null;
 // an image containing all sprites
-let spritesheet = null;
+// let spritesheet = null;
 // true when the spritesheet has been downloaded
-let spritesheetLoaded = false;
+// let spritesheetLoaded = false;
 
-// the world grid: a 2d array of tiles
-let world = [[]];
+// the maze grid: a 2d array of tiles
+let maze = [[]];
 
-// size in the world in sprite tiles
-let worldWidth = 10;
-let worldHeight = 10;
+// size in the maze in sprite tiles
+let mazeWidth = 10;
+let mazeHeight = 10;
 
 // size of a tile in pixels
 let tileWidth = 32;
 let tileHeight = 32;
 
 // start and end of path
-let pathStart = [worldWidth, worldHeight];
+let pathStart = [mazeWidth, mazeHeight];
 let pathEnd = [0, 0];
 let currentPath = [];
 
@@ -47,120 +47,95 @@ let currentPath = [];
 function onload() {
     console.log('Page loaded.');
     canvas = document.getElementById('gameCanvas');
-    canvas.width = worldWidth * tileWidth;
-    canvas.height = worldHeight * tileHeight;
+    canvas.width = mazeWidth * tileWidth;
+    canvas.height = mazeHeight * tileHeight;
     // canvas.addEventListener("click", canvasClick, false);
     canvas.addEventListener("click", fieldClick, false);
     if (!canvas) alert('Blah!');
     ctx = canvas.getContext("2d");
     if (!ctx) alert('Hmm!');
-    // spritesheet = ctx.strokeRect(x, y, width, height);
-    // spritesheet = new Image();
-    // spritesheet.src = 'spritesheet.png';
-    // the image above has been turned into a data url
-    // so that no external files are required for
-    // this web page - useful for included in a
-    // "gist" or "jsfiddle" page
-    // spritesheet.src = 'data:image/png;base64,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';
-    // spritesheet.onload = loaded;
-    createWorld();
+
+    createMaze();
 }
 
-// the spritesheet is ready
-function loaded() {
-    console.log('Spritesheet loaded.');
-    spritesheetLoaded = true;
-    createWorld();
-}
 
-// fill the world with walls
-function createWorld() {
-    console.log('Creating world...');
+// fill the maze with walls
+function createMaze() {
+    console.log('Creating maze...');
 
     // create emptiness
-    for (let x = 0; x < worldWidth; x++) {
-        world[x] = [];
+    for (let x = 0; x < mazeWidth; x++) {
+        maze[x] = [];
 
-        for (let y = 0; y < worldHeight; y++) {
-            world[x][y] = 0;
+        for (let y = 0; y < mazeHeight; y++) {
+            maze[x][y] = 0;
         }
     }
+    // maze.fill( [].fill(0,0, mazeHeight), 0, mazeWidth);
+
 
     // scatter some walls
-    for (let x = 0; x < worldWidth; x++) {
-        for (let y = 0; y < worldHeight; y++) {
+    for (let x = 0; x < mazeWidth; x++) {
+        for (let y = 0; y < mazeHeight; y++) {
             if (Math.random() > 0.75)
-                world[x][y] = 1;
+                maze[x][y] = 1;
         }
     }
 
-    world[0][0] = 0;
-    world[worldWidth-1][worldHeight-1] = 0;
+    maze[0][0] = 0;
+    maze[mazeWidth - 1][mazeHeight - 1] = 0;
 
     // calculate initial possible path
     // note: unlikely but possible to never find one...
     currentPath = [];
 
     // while (currentPath.length == 0) {
-    //     // pathStart = [Math.floor(Math.random() * worldWidth), Math.floor(Math.random() * worldHeight)];
-    //     // pathEnd = [Math.floor(Math.random() * worldWidth), Math.floor(Math.random() * worldHeight)];
+    //     // pathStart = [Math.floor(Math.random() * mazeWidth), Math.floor(Math.random() * mazeHeight)];
+    //     // pathEnd = [Math.floor(Math.random() * mazeWidth), Math.floor(Math.random() * mazeHeight)];
     //     // pathStart = [0, 0];
-    //     // pathEnd = [worldWidth, worldHeight];
-    //     if (world[pathStart[0]][pathStart[1]] == 0)
-    //         currentPath = findPath(world, pathStart, pathEnd);
+    //     // pathEnd = [mazeWidth, mazeHeight];
+    //     if (maze[pathStart[0]][pathStart[1]] == 0)
+    //         currentPath = findPath(maze, pathStart, pathEnd);
     // }
     pathStart = [0, 0];
-    pathEnd = [worldWidth-1, worldHeight-1];
-    currentPath = findPath(world, pathStart, pathEnd);
+    pathEnd = [mazeWidth - 1, mazeHeight - 1];
+    currentPath = findPath(maze, pathStart, pathEnd);
     redraw();
 
 }
 
 function redraw() {
-    // if (!spritesheetLoaded) return;
 
     console.log('redrawing...');
-
-    // let spriteNum = 0;
 
     // clear the screen
     ctx.strokeStyle = '#000000';
     ctx.strokeRect(0, 0, canvas.width, canvas.height);
 
-    for (let x = 0; x < worldWidth; x++) {
-        for (let y = 0; y < worldHeight; y++) {
+    //draw maze
+    console.log('maze: ' + maze);
+    for (let x = 0; x < mazeWidth; x++) {
+        for (let y = 0; y < mazeHeight; y++) {
 
-            // choose a sprite to draw
-            switch (world[x][y]) {
+            // choose a figure to draw
+            switch (maze[x][y]) {
                 case 1:
-                    // spriteNum = 1;
                     ctx.fillStyle = '#000000';
-                    // ctx.fillRect(x * tileWidth, y * tileHeight, tileWidth, tileHeight);
                     ctx.fillRect(x * tileWidth, y * tileHeight, tileWidth, tileHeight);
                     break;
                 default:
-                    // spriteNum = 0;
-                    // ctx.clearRect(x * tileWidth, y * tileHeight, tileWidth, tileHeight);
                     ctx.fillStyle = '#ffffff';
                     ctx.fillRect(x * tileWidth, y * tileHeight, tileWidth, tileHeight);
                     ctx.strokeStyle = '#000000';
                     ctx.strokeRect(x * tileWidth, y * tileHeight, tileWidth, tileHeight);
                     break;
             }
-
-            // draw it
-            // ctx.drawImage(img,sx,sy,swidth,sheight,x,y,width,height);
-            // ctx.drawImage(spritesheet,
-            //     spriteNum * tileWidth, 0,
-            //     tileWidth, tileHeight,
-            //     x * tileWidth, y * tileHeight,
-            //     tileWidth, tileHeight);
-
         }
     }
 
     // draw the path
     console.log('Current path length: ' + currentPath.length);
+    console.log('Current path: ' + currentPath);
     for (let rp = 0; rp < currentPath.length; rp++) {
         switch (rp) {
             case 0:
@@ -176,19 +151,14 @@ function redraw() {
                 ctx.fillStyle = '#fff026';
                 break;
         }
-
-        // ctx.drawImage(spritesheet,
-        //     spriteNum * tileWidth, 0,
-        //     tileWidth, tileHeight,
-        //     currentPath[rp][0] * tileWidth,
-        //     currentPath[rp][1] * tileHeight,
-        //     tileWidth, tileHeight);
         ctx.fillRect(currentPath[rp][0] * tileWidth, currentPath[rp][1] * tileHeight, tileWidth, tileHeight);
         ctx.strokeStyle = '#000000';
         ctx.strokeRect(currentPath[rp][0] * tileWidth, currentPath[rp][1] * tileHeight, tileWidth, tileHeight);
     }
 }
 
+
+// -------------------------------------------------------------------
 // handle click events on the canvas
 function fieldClick(e) {
     let x;
@@ -220,18 +190,19 @@ function fieldClick(e) {
     // now we know while tile we clicked
     console.log('we clicked tile ' + cell[0] + ',' + cell[1]);
 
-    if(world[cell[0]][cell[1]] === 0){
-        world[cell[0]][cell[1]] = 1;
+    if (maze[cell[0]][cell[1]] === 0) {
+        maze[cell[0]][cell[1]] = 1;
     } else {
-        world[cell[0]][cell[1]] = 0;
+        maze[cell[0]][cell[1]] = 0;
     }
 
     // calculate path
-    currentPath = findPath(world, pathStart, pathEnd);
+    currentPath = findPath(maze, pathStart, pathEnd);
     redraw();
 
 }
 
+// -------------------------------------------------------------------
 // handle click events on the canvas
 function canvasClick(e) {
     var x;
@@ -267,166 +238,87 @@ function canvasClick(e) {
     pathEnd = cell;
 
     // calculate path
-    currentPath = findPath(world, pathStart, pathEnd);
+    currentPath = findPath(maze, pathStart, pathEnd);
     redraw();
 }
 
-// world is a 2d array of integers (eg world[10][15] = 0)
+// -------------------------------------------------------------------
+// maze is a 2d array of integers (eg maze[10][15] = 0)
 // pathStart and pathEnd are arrays like [5,10]
-function findPath(world, pathStart, pathEnd) {
+function findPath(maze, pathStart, pathEnd) {
     // shortcuts for speed
-    let abs = Math.abs;
-    let max = Math.max;
-    let pow = Math.pow;
-    let sqrt = Math.sqrt;
+    // let abs = Math.abs;
+    // let max = Math.max;
+    // let pow = Math.pow;
+    // let sqrt = Math.sqrt;
 
-    // the world data are integers:
-    // anything higher than this number is considered blocked
-    // this is handy is you use numbered sprites, more than one
-    // of which is walkable road, grass, mud, etc
-    let maxWalkableTileNum = 0;
 
-    // keep track of the world dimensions
-    // Note that this A-star implementation expects the world array to be square:
-    // it must have equal height and width. If your game world is rectangular,
+    // keep track of the maze dimensions
+    // Note that this A-star implementation expects the maze array to be square:
+    // it must have equal height and width. If your game maze is rectangular,
     // just fill the array with dummy values to pad the empty space.
-    let worldWidth = world[0].length;
-    let worldHeight = world.length;
-    let worldSize = worldWidth * worldHeight;
+    let mazeWidth = maze[0].length;
+    let mazeHeight = maze.length;
+    let mazeSize = mazeWidth * mazeHeight;
 
     // which heuristic should we use?
     // default: no diagonals (Manhattan)
     let distanceFunction = ManhattanDistance;
-    let findNeighbours = function () {
-    }; // empty
 
-    /*
-
-    // alternate heuristics, depending on your game:
-
-    // diagonals allowed but no sqeezing through cracks:
-    let distanceFunction = DiagonalDistance;
-    let findNeighbours = DiagonalNeighbours;
-
-    // diagonals and squeezing through cracks allowed:
-    let distanceFunction = DiagonalDistance;
-    let findNeighbours = DiagonalNeighboursFree;
-
-    // euclidean but no squeezing through cracks:
-    let distanceFunction = EuclideanDistance;
-    let findNeighbours = DiagonalNeighbours;
-
-    // euclidean and squeezing through cracks allowed:
-    let distanceFunction = EuclideanDistance;
-    let findNeighbours = DiagonalNeighboursFree;
-
-    */
 
     // distanceFunction functions
     // these return how far away a point is to another
 
     function ManhattanDistance(Point, Goal) {	// linear movement - no diagonals - just cardinal directions (NSEW)
-        return abs(Point.x - Goal.x) + abs(Point.y - Goal.y);
+        return Math.abs(Point.x - Goal.x) + Math.abs(Point.y - Goal.y);
+        // return 0;
     }
 
-    function DiagonalDistance(Point, Goal) {	// diagonal movement - assumes diag dist is 1, same as cardinals
-        return max(abs(Point.x - Goal.x), abs(Point.y - Goal.y));
-    }
-
-    function EuclideanDistance(Point, Goal) {	// diagonals are considered a little farther than cardinal directions
-        // diagonal movement using Euclide (AC = sqrt(AB^2 + BC^2))
-        // where AB = x2 - x1 and BC = y2 - y1 and AC will be [x3, y3]
-        return sqrt(pow(Point.x - Goal.x, 2) + pow(Point.y - Goal.y, 2));
-    }
-
-    // Neighbours functions, used by findNeighbours function
-    // to locate adjacent available cells that aren't blocked
 
     // Returns every available North, South, East or West
     // cell that is empty. No diagonals,
     // unless distanceFunction function is not Manhattan
-    function Neighbours(x, y) {
-        let N = y - 1,
-            S = y + 1,
-            E = x + 1,
-            W = x - 1,
-            myN = N > -1 && canWalkHere(x, N),
-            myS = S < worldHeight && canWalkHere(x, S),
-            myE = E < worldWidth && canWalkHere(E, y),
-            myW = W > -1 && canWalkHere(W, y),
+    function nextFields(x, y) {
+        let top = y - 1,
+            bottom = y + 1,
+            left = x + 1,
+            right = x - 1,
             result = [];
-        if (myN)
-            result.push({x: x, y: N});
-        if (myE)
-            result.push({x: E, y: y});
-        if (myS)
-            result.push({x: x, y: S});
-        if (myW)
-            result.push({x: W, y: y});
-        findNeighbours(myN, myS, myE, myW, N, S, E, W, result);
+        //стек top, left, bottom, right
+        if (top > -1 && isEmpty(x, top))
+            result.push({x: x, y: top});
+        if (left < mazeWidth && isEmpty(left, y))
+            result.push({x: left, y: y});
+        if (bottom < mazeHeight && isEmpty(x, bottom))
+            result.push({x: x, y: bottom});
+        if (right > -1 && isEmpty(right, y))
+            result.push({x: right, y: y});
         return result;
     }
 
-    // returns every available North East, South East,
-    // South West or North West cell - no squeezing through
-    // "cracks" between two diagonals
-    function DiagonalNeighbours(myN, myS, myE, myW, N, S, E, W, result) {
-        if (myN) {
-            if (myE && canWalkHere(E, N))
-                result.push({x: E, y: N});
-            if (myW && canWalkHere(W, N))
-                result.push({x: W, y: N});
-        }
-        if (myS) {
-            if (myE && canWalkHere(E, S))
-                result.push({x: E, y: S});
-            if (myW && canWalkHere(W, S))
-                result.push({x: W, y: S});
-        }
-    }
 
-    // returns every available North East, South East,
-    // South West or North West cell including the times that
-    // you would be squeezing through a "crack"
-    function DiagonalNeighboursFree(myN, myS, myE, myW, N, S, E, W, result) {
-        myN = N > -1;
-        myS = S < worldHeight;
-        myE = E < worldWidth;
-        myW = W > -1;
-        if (myE) {
-            if (myN && canWalkHere(E, N))
-                result.push({x: E, y: N});
-            if (myS && canWalkHere(E, S))
-                result.push({x: E, y: S});
-        }
-        if (myW) {
-            if (myN && canWalkHere(W, N))
-                result.push({x: W, y: N});
-            if (myS && canWalkHere(W, S))
-                result.push({x: W, y: S});
-        }
-    }
-
-    // returns boolean value (world cell is available and open)
-    function canWalkHere(x, y) {
-        return ((world[x] != null) &&
-            (world[x][y] != null) &&
-            (world[x][y] <= maxWalkableTileNum));
+    // returns boolean value (maze cell is available and open)
+    function isEmpty(x, y) {
+        // return ((maze[x] != null) &&
+        //     (maze[x][y] != null)
+        //      && (maze[x][y] <= 0));
+        return maze[x][y] == 0;
     };
 
     // Node function, returns a new object with Node properties
     // Used in the calculatePath function to store route costs, etc.
-    function Node(Parent, Point) {
+    function Node(prevNode, Point) {
         let newNode = {
             // pointer to another Node object
-            Parent: Parent,
-            // array index of this Node in the world linear array
-            value: Point.x + (Point.y * worldWidth),
+            prev: prevNode,
+            // array index of this Node in the maze linear array
+            value: Point.x + (Point.y * mazeWidth),
             // the location coordinates of this Node
             x: Point.x,
             y: Point.y,
             // the heuristic estimated cost
             // of an entire path using this node
+            // h: distanceFunction(prevNode, Point);
             f: 0,
             // the distanceFunction cost to get
             // from the starting point to this node
@@ -439,43 +331,49 @@ function findPath(world, pathStart, pathEnd) {
     // Path function, executes AStar algorithm operations
     function calculatePath() {
         // create Nodes from the Start and End x,y coordinates
-        let mypathStart = Node(null, {x: pathStart[0], y: pathStart[1]});
-        let mypathEnd = Node(null, {x: pathEnd[0], y: pathEnd[1]});
-        // create an array that will contain all world cells
-        let AStar = new Array(worldSize);
+        let startNode = Node(null, {x: pathStart[0], y: pathStart[1]});
+        let endNode = Node(null, {x: pathEnd[0], y: pathEnd[1]});
+        // create an array that will contain all maze cells
+        let AStar = new Array(mazeSize);
+        console.log("Astar:" + AStar);
         // list of currently open Nodes
-        let Open = [mypathStart];
+        // Множество вершин(очередь), которые предстоит обработать(раскрыть).
+        // Изначально здесь присутствует только начальная вершина start.
+        let Open = [];
+        Open.push(startNode);
         // list of closed Nodes
+        // Множество вершин, которые уже были обработаны(раскрыты)
         let Closed = [];
         // list of the final output array
         let result = [];
-        // reference to a Node (that is nearby)
-        let myNeighbours;
-        // reference to a Node (that we are considering now)
-        let myNode;
+         // reference to a Node (that we are considering now)
+        let currentNode;
         // reference to a Node (that starts a path in question)
-        let myPath;
+        let nextNode;
         // temp integer variables used in the calculations
-        let length, max, min, i, j;
         // iterate through the open list until none are left
-        while (length = Open.length) {
-            max = worldSize;
-            min = -1;
-            for (let i = 0; i < length; i++) {
+
+        while (Open.length) {
+
+            //ищем вершину из open имеющую самую низкую оценку f(x)
+            let max = mazeSize;
+            let min = -1;
+            for (let i in Open) {
                 if (Open[i].f < max) {
                     max = Open[i].f;
                     min = i;
                 }
             }
             // grab the next node and remove it from Open array
-            myNode = Open.splice(min, 1)[0];
+            // Вершина x пошла на обработку, а значит её следует удалить из очереди на обработку
+            currentNode = Open.splice(min, 1)[0];
             // is it the destination node?
-            if (myNode.value === mypathEnd.value) {
-                myPath = Closed[Closed.push(myNode) - 1];
+            if ((currentNode.x === endNode.x) && (currentNode.y === endNode.y)) {
+                nextNode = Closed[Closed.push(currentNode) - 1];
                 do {
-                    result.push([myPath.x, myPath.y]);
+                    result.push([nextNode.x, nextNode.y]);
                 }
-                while (myPath = myPath.Parent);
+                while (nextNode = nextNode.prev);
                 // clear the working arrays
                 AStar = Closed = Open = [];
                 // we want to return start to finish
@@ -484,23 +382,23 @@ function findPath(world, pathStart, pathEnd) {
             else // not the destination
             {
                 // find which nearby nodes are walkable
-                myNeighbours = Neighbours(myNode.x, myNode.y);
                 // test each one that hasn't been tried already
-                for (let i = 0, j = myNeighbours.length; i < j; i++) {
-                    myPath = Node(myNode, myNeighbours[i]);
-                    if (!AStar[myPath.value]) {
+                for (let next of nextFields(currentNode.x, currentNode.y)) {
+                    nextNode = Node(currentNode, next);
+                    if (!AStar[nextNode.value]) {
+                        console.log("Astar:" + AStar);
                         // estimated cost of this particular route so far
-                        myPath.g = myNode.g + distanceFunction(myNeighbours[i], myNode);
+                        nextNode.g = currentNode.g + distanceFunction(currentNode, next);
                         // estimated cost of entire guessed route to the destination
-                        myPath.f = myPath.g + distanceFunction(myNeighbours[i], mypathEnd);
+                        nextNode.f = nextNode.g + distanceFunction(currentNode, next);
                         // remember this new path for testing above
-                        Open.push(myPath);
-                        // mark this node in the world graph as visited
-                        AStar[myPath.value] = true;
+                        Open.push(nextNode);
+                        // mark this node in the maze graph as visited
+                        AStar[nextNode.value] = true;
                     }
                 }
                 // remember this route as having no more untested options
-                Closed.push(myNode);
+                Closed.push(currentNode);
             }
         } // keep iterating until the Open list is empty
         return result;
