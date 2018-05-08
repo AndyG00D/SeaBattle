@@ -27,8 +27,7 @@
 // let maze = [[]];
 
 // size in the maze in sprite tiles
-// let mazeWidth = 10;
-// let mazeHeight = 10;
+
 
 // size of a tile in pixels
 // let tileWidth = 50;
@@ -37,9 +36,10 @@
 // start and end of path
 // let pathStart = [mazeWidth, mazeHeight];
 // let pathEnd = [0, 0];
-let currentPath = [];
 let currentCanvas = null;
 let currentMaze = null;
+let mazeWidth = 10;
+let mazeHeight = 10;
 // ensure that concole.log doesn't cause errors
 // if (typeof console == "undefined") console = {
 //     log: function () {
@@ -48,11 +48,29 @@ let currentMaze = null;
 
 // the html page is ready
 function onload() {
-    currentMaze = new mazeGenerator();
     console.log('Page loaded.');
-    currentCanvas = new canvasMaze();
+
+    currentMaze = new mazeGenerator(mazeWidth, mazeHeight);
+    currentCanvas = new canvasMaze(mazeWidth, mazeHeight, 600 , 600 ,'maze-block', fieldClick);
     currentCanvas.drawMaze(currentMaze.maze);
 }
+
+function clickClear() {
+    let size = document.getElementById("size").value;
+    if (size > 9 && size < 151) {
+        mazeWidth = mazeHeight = document.getElementById("size").value;
+    } else {
+        alert('Size of Maze from 10 to 150')
+    }
+
+    currentMaze = new mazeGenerator(mazeWidth, mazeHeight);
+    currentCanvas = new canvasMaze(mazeWidth, mazeHeight, 600 , 600 ,'maze-block', fieldClick);
+    currentCanvas.drawMaze(currentMaze.maze);
+    // currentMaze.createEmptyField();
+    // currentCanvas.drawMaze(currentMaze.maze);
+
+}
+
 
 // -------------------------------------------------------------------
 // handle click events on the canvas
@@ -60,11 +78,6 @@ function clickFind() {
     let finderPath = new Finder(currentMaze.maze);
     currentCanvas.drawMaze(currentMaze.maze);
     currentCanvas.drawPath(finderPath.find());
-}
-
-function clickClear() {
-    currentMaze.createEmptyField();
-    currentCanvas.drawMaze(currentMaze.maze)
 }
 
 function clickGenerate() {
@@ -283,7 +296,7 @@ class Finder {
         // create Nodes from the Start and End x,y coordinates
         let startNode = new Node();
         // create an array that will contain all maze cells
-        let route = new Array(this._mazeSize);
+        let allPath = new Array(this._mazeSize);
         // list of currently open Nodes
         // Множество вершин(очередь), которые предстоит обработать(раскрыть).
         // Изначально здесь присутствует только начальная вершина start.
@@ -293,7 +306,7 @@ class Finder {
         // Множество вершин, которые уже были обработаны(раскрыты)
         let closed = [];
         // list of the final output array
-        let result = [];
+        let path = [];
         // reference to a Node (that we are considering now)
         let currentNode;
         // reference to a Node (that starts a path in question)
@@ -319,13 +332,13 @@ class Finder {
             if ((currentNode.x === this._end[0]) && (currentNode.y === this._end[1])) {
                 nextNode = closed[closed.push(currentNode) - 1];
                 do {
-                    result.push([nextNode.x, nextNode.y]);
+                    path.push([nextNode.x, nextNode.y]);
                 }
                 while (nextNode = nextNode.prev);
                 // clear the working arrays
-                route = closed = open = [];
+                allPath = closed = open = [];
                 // we want to return start to finish
-                result.reverse();
+                path.reverse();
             }
             else // not the destination
             {
@@ -333,21 +346,20 @@ class Finder {
                 // test each one that hasn't been tried already
                 for (let next of this._getNextNodes(currentNode.x, currentNode.y)) {
                     nextNode = new Node(currentNode, next);
-                    //if (!route[next.x + (next.y * mazeWidth)]) {
-                    if (!route[next.x + (next.y * this._mazeWidth)]) {
+                    //if (!allPath[next.x + (next.y * mazeWidth)]) {
+                    if (!allPath[next.x + (next.y * this._mazeWidth)]) {
                         Open.push(nextNode);
                         // mark this node in the maze graph as visited
-                        route[next.x + (next.y * this._mazeWidth)] = true;
+                        allPath[next.x + (next.y * this._mazeWidth)] = true;
                     }
-                    // console.log(route);
+                    // console.log(allPath);
                 }
-                // remember this route as having no more untested options
+                // remember this allPath as having no more untested options
                 closed.push(currentNode);
             }
         } // keep iterating until the Open list is empty
-        // console.log("result :" + result);
-        if (!result) alert("No way!");
-        return result;
+        if (!path.length) alert("No Path!");
+        return path;
     }
 
 } // end of Finder() function
