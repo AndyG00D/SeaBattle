@@ -17,7 +17,6 @@ export default class canvasMaze {
         console.log('maze: ' + maze);
         for (let x = 0; x < maze[0].length; x++) {
             for (let y = 0; y < maze.length; y++) {
-
                 if (!maze[x][y]) {
                     //empty field
                     this.ctx.fillStyle = '#ffffff';
@@ -75,7 +74,6 @@ export default class canvasMaze {
         let x;
         let y;
 
-        // grab html page coords
         if (e.pageX != undefined && e.pageY != undefined) {
             x = e.pageX;
             y = e.pageY;
@@ -87,18 +85,16 @@ export default class canvasMaze {
                 document.documentElement.scrollTop;
         }
 
-        // make them relative to the canvas only
         x -= this.canvas.offsetLeft;
         y -= this.canvas.offsetTop;
 
-        // return tile x,y that we clicked
+
         let cell =
             [
                 Math.floor(x / this.tileWidth),
                 Math.floor(y / this.tileHeight)
             ];
 
-        // now we know while tile we clicked
         console.log('we clicked tile ' + cell[0] + ',' + cell[1]);
 
         return cell;

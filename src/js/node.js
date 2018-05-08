@@ -19,7 +19,6 @@ export default class Node {
             // the location coordinates of this Node
             this.h = Math.abs(position.x - prevNode.x) + Math.abs(position.y - prevNode.y);
             // the distanceFunction cost to get
-            // from the starting point to this node
             this.g = prevNode.g + this.h;
             // the heuristic estimated cost
             // of an entire path using this node

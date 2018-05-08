@@ -22,7 +22,6 @@ document.addEventListener("DOMContentLoaded", function () {
         currentMaze = new mazeGenerator(mazeWidth, mazeHeight);
         currentCanvas = new canvasMaze(mazeWidth, mazeHeight, 600, 600, 'maze-block', fieldClick);
         currentCanvas.drawMaze(currentMaze.maze);
-
     }
 
 // generate new empty field
@@ -64,9 +63,7 @@ document.addEventListener("DOMContentLoaded", function () {
     onload();
 
     //events-------------------------------
-    document.getElementsByClassName("clear-btn").addEventListener("click", clickClear, false);
-    document.getElementsByClassName("generate-btn").addEventListener("click", clickGenerate, false);
-    document.getElementsByClassName("find-btn").addEventListener("click", clickFind, false);
-
+    document.getElementById("clear-btn").addEventListener("click", clickClear);
+    document.getElementsByClassName("generate-btn")[0].addEventListener("click", clickGenerate);
+    document.getElementsByClassName("find-btn")[0].addEventListener("click", clickFind);
 });
-
