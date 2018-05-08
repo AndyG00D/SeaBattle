@@ -6,17 +6,20 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div><canvas id="gameCanvas"></canvas></div>
+<div><canvas id="maze-block"></canvas></div>
 <div>
-    <input type='button' onClick='createMaze()' value='Generate Maze'>
+    <input type='button' onClick='clickClear()' value='Clear'>
 </div>
 <div>
-    <input type='button' onClick='findClick()' value='Find Path'>
+    <input type='button' onClick='clickGenerate()' value='Generate Maze'>
+</div>
+<div>
+    <input type='button' onClick='clickFind()' value='Find Path'>
 </div>
 
 <!--<canvas id="canvas" width="480px" height="446px">-->
 <!--</canvas>-->
-<script src="js.js"></script>
+<script src="js/js.js"></script>
 <!--<script src="js2.js"></script>-->
 </body>
 </html>

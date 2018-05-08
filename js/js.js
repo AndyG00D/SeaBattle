@@ -1,5 +1,7 @@
 'use strict';
 
+// import Node from './node';
+
 // A* Pathfinding for HTML5 Canvas Tutorial
 // by Christer (McFunkypants) Kaitila
 // http://www.mcfunkypants.com
@@ -13,30 +15,31 @@
 // way you like, commercial or otherwise. Enjoy!
 
 // the game's canvas element
-let canvas = null;
+// let canvas = null;
 // the canvas 2d context
-let ctx = null;
+// let ctx = null;
 // an image containing all sprites
 // let spritesheet = null;
 // true when the spritesheet has been downloaded
 // let spritesheetLoaded = false;
 
 // the maze grid: a 2d array of tiles
-let maze = [[]];
+// let maze = [[]];
 
 // size in the maze in sprite tiles
-let mazeWidth = 30;
-let mazeHeight = 30;
+// let mazeWidth = 10;
+// let mazeHeight = 10;
 
 // size of a tile in pixels
-let tileWidth = 32;
-let tileHeight = 32;
+// let tileWidth = 50;
+// let tileHeight = 50;
 
 // start and end of path
 // let pathStart = [mazeWidth, mazeHeight];
 // let pathEnd = [0, 0];
 let currentPath = [];
-
+let currentCanvas = null;
+let currentMaze = null;
 // ensure that concole.log doesn't cause errors
 // if (typeof console == "undefined") console = {
 //     log: function () {
@@ -45,94 +48,123 @@ let currentPath = [];
 
 // the html page is ready
 function onload() {
+    currentMaze = new mazeGenerator();
     console.log('Page loaded.');
-    canvas = document.getElementById('gameCanvas');
-    canvas.width = mazeWidth * tileWidth;
-    canvas.height = mazeHeight * tileHeight;
-    // canvas.addEventListener("click", canvasClick, false);
-    canvas.addEventListener("click", fieldClick, false);
-    if (!canvas) alert('Blah!');
-    ctx = canvas.getContext("2d");
-    if (!ctx) alert('Hmm!');
+    currentCanvas = new canvasMaze();
+    currentCanvas.drawMaze(currentMaze.maze);
+}
 
-    createMaze();
+// -------------------------------------------------------------------
+// handle click events on the canvas
+function clickFind() {
+    let finderPath = new Finder(currentMaze.maze);
+    currentCanvas.drawMaze(currentMaze.maze);
+    currentCanvas.drawPath(finderPath.find());
+}
+
+function clickClear() {
+    currentMaze.createEmptyField();
+    currentCanvas.drawMaze(currentMaze.maze)
+}
+
+function clickGenerate() {
+    currentMaze.createMaze();
+    currentCanvas.drawMaze(currentMaze.maze);
 }
 
 
-// fill the maze with walls
-function createMaze() {
-    console.log('Creating maze...');
-
-    // create emptiness
-    for (let x = 0; x < mazeWidth; x++) {
-        maze[x] = [];
-
-        for (let y = 0; y < mazeHeight; y++) {
-            maze[x][y] = 0;
-        }
-    }
-    // maze.fill( [].fill(0,0, mazeHeight), 0, mazeWidth);
-
-
-    // scatter some walls
-    for (let x = 0; x < mazeWidth; x++) {
-        for (let y = 0; y < mazeHeight; y++) {
-            if (Math.random() > 0.75)
-                maze[x][y] = 1;
-        }
-    }
-
-    maze[0][0] = 0;
-    maze[mazeWidth - 1][mazeHeight - 1] = 0;
-
-    // calculate initial possible path
-    // note: unlikely but possible to never find one...
-    currentPath = [];
-
-    // while (currentPath.length == 0) {
-    //     // pathStart = [Math.floor(Math.random() * mazeWidth), Math.floor(Math.random() * mazeHeight)];
-    //     // pathEnd = [Math.floor(Math.random() * mazeWidth), Math.floor(Math.random() * mazeHeight)];
-    //     // pathStart = [0, 0];
-    //     // pathEnd = [mazeWidth, mazeHeight];
-    //     if (maze[pathStart[0]][pathStart[1]] == 0)
-    //         currentPath = Finder(maze, pathStart, pathEnd);
-    // }
-    //pathStart = [0, 0];
-    //pathEnd = [mazeWidth - 1, mazeHeight - 1];
-    //currentPath = Finder(maze, pathStart, pathEnd);
-    redraw();
-
+// -------------------------------------------------------------------
+// handle click events on the canvas
+function fieldClick(e) {
+    let cell = currentCanvas.getPointerPosition(e);
+    currentMaze.changeField(...cell);
+    currentCanvas.drawMaze(currentMaze.maze);
 }
 
-function redraw() {
 
-    console.log('redrawing...');
+class mazeGenerator {
+    constructor(mazeWidth = 10, mazeHeight = 10){
+    this.mazeWidth = mazeWidth;
+    this.mazeHeight = mazeHeight;
+    this.maze = [[]];
+    this.createEmptyField();
+    }
 
-    // clear the screen
-    ctx.strokeStyle = '#000000';
-    ctx.strokeRect(0, 0, canvas.width, canvas.height);
+    createEmptyField() {
+        // create emptiness
+        for (let x = 0; x < this.mazeWidth; x++) {
+            this.maze[x] = [];
 
-    //draw maze
-    console.log('maze: ' + maze);
-    for (let x = 0; x < mazeWidth; x++) {
-        for (let y = 0; y < mazeHeight; y++) {
-
-            // choose a figure to draw
-            switch (maze[x][y]) {
-                case 1:
-                    ctx.fillStyle = '#000000';
-                    ctx.fillRect(x * tileWidth, y * tileHeight, tileWidth, tileHeight);
-                    break;
-                default:
-                    ctx.fillStyle = '#ffffff';
-                    ctx.fillRect(x * tileWidth, y * tileHeight, tileWidth, tileHeight);
-                    ctx.strokeStyle = '#000000';
-                    ctx.strokeRect(x * tileWidth, y * tileHeight, tileWidth, tileHeight);
-                    break;
+            for (let y = 0; y < this.mazeHeight; y++) {
+                this.maze[x][y] = 0;
             }
         }
     }
 
+
+// fill the maze with walls
+    createMaze() {
+        console.log('Creating maze...');
+
+        this.createEmptyField();
+
+        // scatter some walls
+        for (let x = 0; x < this.mazeWidth; x++) {
+            for (let y = 0; y < this.mazeHeight; y++) {
+                if (Math.random() > 0.75) {
+                    this.maze[x][y] = 1;
+                } else {
+                    this.maze[x][y] = 0;
+                }
+            }
+        }
+
+        this.maze[0][0] = 0;
+        this.maze[this.mazeWidth - 1][this.mazeHeight - 1] = 0;
+    }
+
+    changeField(x,y){
+        if (this.maze[x][y] === 0) {
+            this.maze[x][y] = 1;
+        } else {
+            this.maze[x][y] = 0;
+        }
+    }
+}
+class canvasMaze{
+    constructor(mazeWidth = 10, mazeHeight = 10, width = 600, height = 600, elem = 'maze-block', event = fieldClick){
+        this.tileWidth = width / mazeWidth;
+        this.tileHeight = height / mazeHeight;
+        this.canvas = document.getElementById(elem);
+        this.canvas.width = width;
+        this.canvas.height = height;
+        this.canvas.addEventListener("click", event, false);
+        if (!this.canvas) alert('Canvas ERROR!');
+        this.ctx = this.canvas.getContext("2d");
+        if (!this.ctx) alert('Canvas ERROR!');
+    }
+
+drawMaze(maze) {
+    console.log('maze: ' + maze);
+    for (let x = 0; x < maze[0].length; x++) {
+        for (let y = 0; y < maze.length; y++) {
+
+            if (!maze[x][y]) {
+                //empty field
+                this.ctx.fillStyle = '#ffffff';
+                this.ctx.fillRect(x * this.tileWidth, y * this.tileHeight, this.tileWidth, this.tileHeight);
+                this.ctx.strokeStyle = '#000000';
+                this.ctx.strokeRect(x * this.tileWidth, y * this.tileHeight, this.tileWidth, this.tileHeight);
+            } else {
+                //wall
+                this.ctx.fillStyle = '#000000';
+                this.ctx.fillRect(x * this.tileWidth, y * this.tileHeight, this.tileWidth, this.tileHeight);
+            }
+        }
+    }
+}
+
+drawPath(currentPath) {
     // draw the path
     console.log('Current path length: ' + currentPath.length);
     console.log('Current path: ' + currentPath);
@@ -140,27 +172,37 @@ function redraw() {
         switch (rp) {
             case 0:
                 // start
-                ctx.fillStyle = '#00ff6e';
+                this.ctx.fillStyle = '#00ff6e';
                 break;
             case currentPath.length - 1:
                 // end
-                ctx.fillStyle = '#d72f2c';
+                this.ctx.fillStyle = '#d72f2c';
                 break;
             default:
                 //path node
-                ctx.fillStyle = '#fff026';
+                this.ctx.fillStyle = '#fff026';
                 break;
         }
-        ctx.fillRect(currentPath[rp][0] * tileWidth, currentPath[rp][1] * tileHeight, tileWidth, tileHeight);
-        ctx.strokeStyle = '#000000';
-        ctx.strokeRect(currentPath[rp][0] * tileWidth, currentPath[rp][1] * tileHeight, tileWidth, tileHeight);
+        this.ctx.fillRect(currentPath[rp][0] * this.tileWidth, currentPath[rp][1] * this.tileHeight, this.tileWidth, this.tileHeight);
+        this.ctx.strokeStyle = '#000000';
+        this.ctx.strokeRect(currentPath[rp][0] * this.tileWidth, currentPath[rp][1] * this.tileHeight, this.tileWidth, this.tileHeight);
     }
 }
 
+redraw(maze, path){
 
-// -------------------------------------------------------------------
-// handle click events on the canvas
-function fieldClick(e) {
+    console.log('redrawing...');
+
+    // clear the screen
+    this.ctx.strokeStyle = '#000000';
+    this.ctx.strokeRect(0, 0, this.width, this.height);
+
+    this.drawMaze(maze);
+    this.drawPath(path);
+}
+
+getPointerPosition(e) {
+
     let x;
     let y;
 
@@ -177,74 +219,29 @@ function fieldClick(e) {
     }
 
     // make them relative to the canvas only
-    x -= canvas.offsetLeft;
-    y -= canvas.offsetTop;
+    x -= this.canvas.offsetLeft;
+    y -= this.canvas.offsetTop;
 
     // return tile x,y that we clicked
     let cell =
         [
-            Math.floor(x / tileWidth),
-            Math.floor(y / tileHeight)
+            Math.floor(x / this.tileWidth),
+            Math.floor(y / this.tileHeight)
         ];
 
     // now we know while tile we clicked
     console.log('we clicked tile ' + cell[0] + ',' + cell[1]);
 
-    if (maze[cell[0]][cell[1]] === 0) {
-        maze[cell[0]][cell[1]] = 1;
-    } else {
-        maze[cell[0]][cell[1]] = 0;
-    }
-
-    // calculate path
-    // currentPath = Finder(maze, pathStart, pathEnd);
-    redraw();
-
+    return cell;
 }
-
-// -------------------------------------------------------------------
-// handle click events on the canvas
-function findClick() {
-    let finderPath = new Finder(maze);
-    currentPath = finderPath.find();
-    redraw();
-}
-
-
-// Node class, returns a new object with Node properties
-// Used in the _findPath function to store route costs, etc.
-class Node {
-    constructor(prevNode = null, position = {x: 0, y: 0}) {
-        this.x = position.x;
-        this.y = position.y;
-        // pointer to another Node object
-        this.prev = prevNode;
-        if (!prevNode) {
-            this.h = 0;
-            this.g = 0;
-            this.f = 0;
-        } else {
-
-            // array index of this Node in the maze linear array
-            // this.value = position.x + (position.y * mazeWidth);
-            // the location coordinates of this Node
-            this.h = Math.abs(position.x - prevNode.x) + Math.abs(position.y - prevNode.y);
-            // the distanceFunction cost to get
-            // from the starting point to this node
-            this.g = prevNode.g + this.h;
-            // the heuristic estimated cost
-            // of an entire path using this node
-            this.f = this.g + this.h;
-        }
-    }
 }
 
 
 // -------------------------------------------------------------------
 // maze is a 2d array of integers (eg maze[10][15] = 0)
 // pathStart and pathEnd are arrays like [5,10]
-class Finder{
-    constructor(maze){
+class Finder {
+    constructor(maze) {
         this.maze = maze;
         this._mazeWidth = maze[0].length;
         this._mazeHeight = maze.length;
@@ -287,11 +284,11 @@ class Finder{
         let startNode = new Node();
         // create an array that will contain all maze cells
         let route = new Array(this._mazeSize);
-         // list of currently open Nodes
+        // list of currently open Nodes
         // Множество вершин(очередь), которые предстоит обработать(раскрыть).
         // Изначально здесь присутствует только начальная вершина start.
-        let Open = [];
-        Open.push(startNode);
+        let Open = [startNode];
+        // Open.push(startNode);
         // list of closed Nodes
         // Множество вершин, которые уже были обработаны(раскрыты)
         let closed = [];
@@ -348,11 +345,39 @@ class Finder{
                 closed.push(currentNode);
             }
         } // keep iterating until the Open list is empty
-        console.log("result :" + result);
+        // console.log("result :" + result);
+        if (!result) alert("No way!");
         return result;
     }
 
 } // end of Finder() function
+
+class Node {
+    constructor(prevNode = null, position = {x: 0, y: 0}) {
+        this.x = position.x;
+        this.y = position.y;
+        // pointer to another Node object
+        this.prev = prevNode;
+        if (!prevNode) {
+            this.h = 0;
+            this.g = 0;
+            this.f = 0;
+        } else {
+
+            // array index of this Node in the maze linear array
+            // this.value = position.x + (position.y * mazeWidth);
+            // the location coordinates of this Node
+            this.h = Math.abs(position.x - prevNode.x) + Math.abs(position.y - prevNode.y);
+            // the distanceFunction cost to get
+            // from the starting point to this node
+            this.g = prevNode.g + this.h;
+            // the heuristic estimated cost
+            // of an entire path using this node
+            this.f = this.g + this.h;
+        }
+    }
+}
+
 
 // start running immediately
 onload();
