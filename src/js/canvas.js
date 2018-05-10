@@ -5,10 +5,10 @@ const fieldClick = function () {
 };
 
 
-export default class CanvasMaze {
-  constructor(mazeWidth = 10, mazeHeight = 10, width = 600, height = 600, elem = 'maze-block', event = fieldClick) {
-    this.tileWidth = width / mazeWidth;
-    this.tileHeight = height / mazeHeight;
+export default class Canvasfield {
+  constructor(fieldWidth = 10, fieldHeight = 10, width = 600, height = 600, elem = 'field-block', event = fieldClick) {
+    this.tileWidth = width / fieldWidth;
+    this.tileHeight = height / fieldHeight;
     this.canvas = document.getElementById(elem);
     this.canvas.width = width;
     this.canvas.height = height;
@@ -18,11 +18,11 @@ export default class CanvasMaze {
     if (!this.ctx) alert('Canvas ERROR!');
   }
 
-  drawMaze(maze) {
-    console.log(`maze: ${maze}`);
-    for (let x in maze[0]) {
-      for (let y in maze) {
-        if (!maze[x][y]) {
+  drawfield(field) {
+    console.log(`field: ${field}`);
+    for (let x in field[0]) {
+      for (let y in field) {
+        if (!field[x][y]) {
           // empty field
           this.ctx.fillStyle = '#ffffff';
           this.ctx.fillRect(x * this.tileWidth, y * this.tileHeight, this.tileWidth, this.tileHeight);
@@ -62,14 +62,14 @@ export default class CanvasMaze {
     }
   }
 
-  redraw(maze, path) {
+  redraw(field, path) {
     console.log('redrawing...');
 
     // clear the screen
     this.ctx.strokeStyle = '#000000';
     this.ctx.strokeRect(0, 0, this.width, this.height);
 
-    this.drawMaze(maze);
+    this.drawfield(field);
     this.drawPath(path);
   }
 
