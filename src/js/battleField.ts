@@ -42,7 +42,7 @@ export default class BattleField {
     fieldWidth: number;
     fieldHeight: number;
     ships: number[];
-    field: [[number]];
+    field: number[][];
     // cellWidgets: any;
 
     constructor(fieldWidth = 10, fieldHeight = 10) {
@@ -50,13 +50,24 @@ export default class BattleField {
         this.fieldHeight = fieldHeight;
         this.ships = [0, 4, 3, 2, 1];
         // this.cellWidgets = new Cell(new Pos(), null);
-        this.field = [[0]];
+        // this.field = [  [0,0,0,0,0,0,0,0,0,0],
+        //                 [0,0,0,0,0,0,0,0,0,0],
+        //                 [0,0,0,0,0,0,0,0,0,0],
+        //                 [0,0,0,0,0,0,0,0,0,0],
+        //                 [0,0,0,0,0,0,0,0,0,0],
+        //                 [0,0,0,0,0,0,0,0,0,0],
+        //                 [0,0,0,0,0,0,0,0,0,0],
+        //                 [0,0,0,0,0,0,0,0,0,0],
+        //                 [0,0,0,0,0,0,0,0,0,0],
+        //                 [0,0,0,0,0,0,0,0,0,0]];
+        // ];
         // window.console.log('field: ' + this.field);
     }
 
     createEmptyField(): void {
+        this.field = new Array(this.fieldWidth);
         for (let x: number = 0; x < this.fieldWidth; x++) {
-            this.field[x] = [this.fieldHeight];
+            this.field[x] = new Array(this.fieldHeight);
             for (let y: number = 0; y < this.fieldHeight; y++) {
                 // window.console.log('x:' + x + ', y:' + y +', val:' + this.field[x][y]);
                 this.field[x][y] = 0;
@@ -76,9 +87,6 @@ export default class BattleField {
         this.field[x][y] = +!this.field[x][y];
     }
 
-    /**
-     * Информация о караблях (длина корабля / количество кораблей)
-     */
     // ShipsInfo = {
     //
     //     /**
@@ -148,19 +156,21 @@ export default class BattleField {
         let shipIsPlaced: boolean = false;
 
         while (!shipIsPlaced) {
-            let isVertical: boolean = Math.random() > 0.5 ? true : false;
-            let x: number = this.randomPos(this.fieldWidth);
-            let y: number = this.randomPos(this.fieldHeight);
+            let isVertical: boolean = Math.random() > 0.5;
+            let x: number;
+            let y: number;
 
             // find rand coordinates begin of ship
             if (isVertical) {
-                while (y + shipLength >= this.fieldHeight) {
-                    y = this.randomPos(this.fieldHeight);
-                }
+                // while (y + shipLength >= this.fieldHeight) {
+                    x = BattleField.randomPos(this.fieldWidth);
+                    y = BattleField.randomPos(this.fieldHeight - shipLength);
+                // }
             } else { //horizontal
-                while (x + shipLength >= this.fieldWidth) {
-                    x = this.randomPos(this.fieldWidth);
-                }
+                // while (x + shipLength >= this.fieldWidth) {
+                    x = BattleField.randomPos(this.fieldWidth -shipLength);
+                    y = BattleField.randomPos(this.fieldHeight);
+                // }
             }
 
             // check aria around has near ships
@@ -189,8 +199,8 @@ export default class BattleField {
     }
 
     //generate random position
-    randomPos(range: number) {
-        return Math.floor(Math.random() * (range - 1));
+    static randomPos(range: number) {
+        return Math.floor(Math.random() * range);
     }
 
     //Area around placing ship has other ships
@@ -228,16 +238,14 @@ export default class BattleField {
 
     //cut side of area if it out edge of field
     cutAreaOutField(point: number, length: number) {
-        if (point < 0) point = 0;
-        if (point > length) point = length;
+        if (point < 0) return 0;
+        if (point > length-1) {
+            return length - 1;
+        }
         return point;
     }
 
 
-    /**
-     * Устанавливает ячейку подбитой
-     * @param pos позиция ячейки
-     */
     // setCellFired(pos:Pos) {
     //     let cell = this.getCellByPosition(pos);
     //     if (cell) {
