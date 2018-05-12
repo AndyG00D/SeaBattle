@@ -43,12 +43,14 @@ export default class BattleField {
     fieldHeight: number;
     ships: number[];
     field: number[][];
+    autoInit: boolean;
     // cellWidgets: any;
 
     constructor(fieldWidth = 10, fieldHeight = 10) {
         this.fieldWidth = fieldWidth;
         this.fieldHeight = fieldHeight;
         this.ships = [0, 4, 3, 2, 1];
+        this.autoInit = false;
         // this.cellWidgets = new Cell(new Pos(), null);
         // this.field = [  [0,0,0,0,0,0,0,0,0,0],
         //                 [0,0,0,0,0,0,0,0,0,0],
@@ -63,6 +65,10 @@ export default class BattleField {
         // ];
         // window.console.log('field: ' + this.field);
     }
+
+
+
+
 
     createEmptyField(): void {
         this.field = new Array(this.fieldWidth);
@@ -135,6 +141,12 @@ export default class BattleField {
     //     }
     // }
 
+    //_________Functions for automatic generate battle field
+
+    // currentShip = {
+    //
+    //
+    // };
 
     //1. init ships
     initShips() {
@@ -154,23 +166,27 @@ export default class BattleField {
     placingShip(shipLength: number) {
 
         let shipIsPlaced: boolean = false;
+        let isVertical: boolean;
+        let x: number;
+        let y: number;
 
         while (!shipIsPlaced) {
-            let isVertical: boolean = Math.random() > 0.5;
-            let x: number;
-            let y: number;
 
-            // find rand coordinates begin of ship
-            if (isVertical) {
-                // while (y + shipLength >= this.fieldHeight) {
+            (!this.autoInit)
+            {
+                isVertical = Math.random() > 0.5;
+                // find rand coordinates begin of ship
+                if (isVertical) {
+                    // while (y + shipLength >= this.fieldHeight) {
                     x = BattleField.randomPos(this.fieldWidth);
                     y = BattleField.randomPos(this.fieldHeight - shipLength);
-                // }
-            } else { //horizontal
-                // while (x + shipLength >= this.fieldWidth) {
-                    x = BattleField.randomPos(this.fieldWidth -shipLength);
+                    // }
+                } else { //horizontal
+                    // while (x + shipLength >= this.fieldWidth) {
+                    x = BattleField.randomPos(this.fieldWidth - shipLength);
                     y = BattleField.randomPos(this.fieldHeight);
-                // }
+                    // }
+                }
             }
 
             // check aria around has near ships
@@ -198,12 +214,12 @@ export default class BattleField {
         }
     }
 
-    //generate random position
+    //3.1 generate random position
     static randomPos(range: number) {
         return Math.floor(Math.random() * range);
     }
 
-    //Area around placing ship has other ships
+    //4. Area around placing ship has other ships
     isShipsInArea(x: number, y: number, isVertical: boolean, shipLength: number): boolean {
         //position of area around ship
         let topLeftPos: Pos = new Pos(x - 1, y - 1);
@@ -236,7 +252,7 @@ export default class BattleField {
         return false;
     }
 
-    //cut side of area if it out edge of field
+    // 4.1 cut side of area if it out edge of field
     cutAreaOutField(point: number, length: number) {
         if (point < 0) return 0;
         if (point > length-1) {
@@ -262,7 +278,7 @@ export default class BattleField {
     //     let cell = this.getCellByPosition(pos);
     //     return cell.ship;
     // }
-    //
+
     // /**
     //  * Возвращает ячейку по переданной позиции
     //  * @param pos позиция
