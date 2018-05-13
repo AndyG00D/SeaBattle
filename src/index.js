@@ -16,9 +16,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function clickGenerate() {
     currentCanvas.canvas.removeEventListener('mousemove', moveField, false);
-    currentCanvas.isAuto = true;
+    // currentCanvas.isAuto = true;
     currentCanvas.createEmptyField();
     currentCanvas.initShips();
+    // currentCanvas.getShip();
+    currentCanvas.autoPlacingShip();
     // currentfield.createfield();
     currentCanvas.drawfield();
   }
@@ -28,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const cell = currentCanvas.getPointerPosition(e);
     // currentCanvas.changeField(...cell);
     currentCanvas.drawfield();
-    currentCanvas.drawMove(cell[0], cell[1], currentCanvas.initShip.isVertical, currentCanvas.initShip.shipLength);
+    currentCanvas.drawMove(...cell);
   }
 
   function toggleVertical(e) {
@@ -40,8 +42,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const cell = currentCanvas.getPointerPosition(e);
     currentCanvas.initShip.x = cell[0];
     currentCanvas.initShip.y = cell[1];
+    currentCanvas.placingShip();
     // clearTimeout(currentCanvas.waitUser);
-    currentCanvas.waitUser = true;
+    // currentCanvas.waitUser = true;
     currentCanvas.drawfield();
   }
 
@@ -69,13 +72,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // } else {
     //   alert('Size of field from 10 to 150');
     // }
-    currentCanvas.canvas.addEventListener('mousemove', moveField, false);
+    currentCanvas.canvas.onmousemove = moveField;
     // currentCanvas.canvas.addEventListener('contextmenu', toggleVertical, false);
     currentCanvas.canvas.oncontextmenu = toggleVertical;
     currentCanvas.canvas.onclick = clickField;
     currentCanvas.isAuto = false;
     currentCanvas.createEmptyField();
     currentCanvas.initShips();
+    // currentCanvas.getShip();
     // currentfield.createfield();
     currentCanvas.drawfield();
     // currentCanvas.createEmptyField();

@@ -41,14 +41,14 @@ export default class Canvasfield extends BattleField {
   }
 
 
-  drawMove(x, y, isVertical, length) {
-    if (isVertical) {
-      for (let i = y; i < y + length; i++) {
+  drawMove(x, y) {
+    if (this.initShip.isVertical) {
+      for (let i = y; i < y + this.initShip.length; i++) {
         this.ctx.fillStyle = '#7f7f7f';
         this.ctx.fillRect(x * this.tileWidth, i * this.tileHeight, this.tileWidth, this.tileHeight);
       }
     } else {
-      for (let i = x; i < x + length; i++) {
+      for (let i = x; i < x + this.initShip.length; i++) {
         this.ctx.fillStyle = '#7f7f7f';
         this.ctx.fillRect(i * this.tileWidth, y * this.tileHeight, this.tileWidth, this.tileHeight);
       }
@@ -70,7 +70,7 @@ export default class Canvasfield extends BattleField {
   // }
 
   redraw() {
-    console.log('redrawing...');
+    // console.log('redrawing...');
 
     // clear the screen
     this.ctx.strokeStyle = '#000000';
