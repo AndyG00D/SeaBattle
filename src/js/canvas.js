@@ -101,7 +101,7 @@ export default class Canvasfield extends BattleField {
               Math.floor(y / this.tileHeight),
             ];
 
-    console.log(`we clicked tile ${cell[0]},${cell[1]}`);
+    // console.log(`we clicked tile ${cell[0]},${cell[1]}`);
 
     return cell;
   }

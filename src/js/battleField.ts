@@ -38,19 +38,37 @@ class Cell {
 // }
 
 
+class Ship{
+    shipNumber: number;
+    shipLength: number;
+    shipIsPlaced: boolean;
+    isVertical: boolean;
+    x: number;
+    y: number;
+}
+
+
 export default class BattleField {
     fieldWidth: number;
     fieldHeight: number;
     ships: number[];
     field: number[][];
-    autoInit: boolean;
+    isAuto: boolean;
+    initShip: Ship;
+    waitUser: boolean;
+    // autoInit: boolean;
     // cellWidgets: any;
+
 
     constructor(fieldWidth = 10, fieldHeight = 10) {
         this.fieldWidth = fieldWidth;
         this.fieldHeight = fieldHeight;
         this.ships = [0, 4, 3, 2, 1];
-        this.autoInit = false;
+        // this.autoInit = false;
+        this.initShip = new Ship();
+        this.isAuto = true;
+        this.initShip.isVertical = false;
+
         // this.cellWidgets = new Cell(new Pos(), null);
         // this.field = [  [0,0,0,0,0,0,0,0,0,0],
         //                 [0,0,0,0,0,0,0,0,0,0],
@@ -143,63 +161,71 @@ export default class BattleField {
 
     //_________Functions for automatic generate battle field
 
-    // currentShip = {
-    //
-    //
-    // };
+
 
     //1. init ships
-    initShips() {
+    initShips():void {
         for (let i = 4; i > 0; i--) {
-            this.placingShips(this.ships[i], i);
+            this.initShip.shipNumber = this.ships[i];
+            this.initShip.shipLength = i;
+            this.placingShips();
         }
     }
 
     // 2. Placing ships with same length
-    placingShips(shipNumber: number, shipLength: number): void {
-        for (let i = 0; i < shipNumber; i++) {
-            this.placingShip(shipLength);
+    placingShips(): void {
+        for (let i = 0; i < this.initShip.shipNumber; i++) {
+            this.placingShip();
         }
     }
 
+    // sleep(ms) {
+    //     return new Promise(this.waitUser = (resolve) => setTimeout(resolve, ms));
+    // }
+
+
     // 3. Placing ship
-    placingShip(shipLength: number) {
+    placingShip() {
 
-        let shipIsPlaced: boolean = false;
-        let isVertical: boolean;
-        let x: number;
-        let y: number;
+        this.initShip.shipIsPlaced = false;
 
-        while (!shipIsPlaced) {
+        while (!this.initShip.shipIsPlaced) {
 
-            (!this.autoInit)
-            {
-                isVertical = Math.random() > 0.5;
+            if (this.isAuto) {
+                this.initShip.isVertical = Math.random() > 0.5;
                 // find rand coordinates begin of ship
-                if (isVertical) {
+                if (this.initShip.isVertical) {
                     // while (y + shipLength >= this.fieldHeight) {
-                    x = BattleField.randomPos(this.fieldWidth);
-                    y = BattleField.randomPos(this.fieldHeight - shipLength);
+                    this.initShip.x = BattleField.randomPos(this.fieldWidth);
+                    this.initShip.y = BattleField.randomPos(this.fieldHeight - this.initShip.shipLength);
                     // }
                 } else { //horizontal
                     // while (x + shipLength >= this.fieldWidth) {
-                    x = BattleField.randomPos(this.fieldWidth - shipLength);
-                    y = BattleField.randomPos(this.fieldHeight);
+                    this.initShip.x = BattleField.randomPos(this.fieldWidth - this.initShip.shipLength);
+                    this.initShip.y = BattleField.randomPos(this.fieldHeight);
                     // }
                 }
+            } else {
+                // window.console.log("Wait...");
+                // // this.waitUser = setTimeout(() =>{}, 5000000000);
+                // // await this.sleep(20000000);
+                // this.waitUser = false;
+                // await this.sleep()};
+                // window.console.log("Run...");
             }
 
+
             // check aria around has near ships
-            if (!this.isShipsInArea(x, y, isVertical, shipLength)) {
+            if (!this.isShipsInArea()) {
                 let shipPositions = [];
 
-                if (isVertical) {
-                    for (let i = y; i < (y + shipLength); i++) {
-                        shipPositions.push(new Pos(x, i))
+                if (this.initShip.isVertical) {
+                    for (let i = this.initShip.y; i < (this.initShip.y + this.initShip.shipLength); i++) {
+                        shipPositions.push(new Pos(this.initShip.x, i))
                     }
                 } else { // horizontal
-                    for (let i = x; i < (x + shipLength); i++) {
-                        shipPositions.push(new Pos(i, y));
+                    for (let i = this.initShip.x; i < (this.initShip.x + this.initShip.shipLength); i++) {
+                        shipPositions.push(new Pos(i, this.initShip.y));
                     }
                 }
 
@@ -209,26 +235,26 @@ export default class BattleField {
                     this.field[pos.x][pos.y] = 1;
                 }
 
-                shipIsPlaced = true;
+                this.initShip.shipIsPlaced = true;
             }
         }
     }
 
     //3.1 generate random position
-    static randomPos(range: number) {
+    static randomPos(range: number):number {
         return Math.floor(Math.random() * range);
     }
 
     //4. Area around placing ship has other ships
-    isShipsInArea(x: number, y: number, isVertical: boolean, shipLength: number): boolean {
+    isShipsInArea(): boolean {
         //position of area around ship
-        let topLeftPos: Pos = new Pos(x - 1, y - 1);
+        let topLeftPos: Pos = new Pos(this.initShip.x - 1, this.initShip.y - 1);
         let bottomRightPos: Pos;
 
-        if (isVertical) {
-            bottomRightPos = new Pos(x + 1, y + shipLength + 1);
+        if (this.initShip.isVertical) {
+            bottomRightPos = new Pos(this.initShip.x + 1, this.initShip.y + this.initShip.shipLength + 1);
         } else {
-            bottomRightPos = new Pos(x + shipLength + 1, y + 1);
+            bottomRightPos = new Pos(this.initShip.x + this.initShip.shipLength + 1, this.initShip.y + 1);
         }
 
         //cut part of area if it out edge of field
