@@ -8,7 +8,7 @@ module.exports = {
     test: './src/index.ts',
   },
   mode: 'development',
-  devtool: 'eval',
+  // devtool: 'eval',
   output: {
     path: `${__dirname}/dist`,
     publicPath: '/',
@@ -37,7 +37,7 @@ module.exports = {
         ],
       },
       {
-        test: /\.tsx?$/,
+        test: /\.ts?$/,
         use: 'ts-loader',
         exclude: /node_modules/,
       },

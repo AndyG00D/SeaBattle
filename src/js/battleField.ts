@@ -20,15 +20,15 @@ class Pos {
  * @param ship корабль, который установлен на ячейку
  * @constructor
  */
-class Cell {
-    pos: Pos;
-    ship: any;
-
-    constructor(pos: Pos, ship: any) {
-        this.pos = pos;
-        this.ship = ship;
-    }
-}
+// class Cell {
+//     pos: Pos;
+//     ship: any;
+//
+//     constructor(pos: Pos, ship: any) {
+//         this.pos = pos;
+//         this.ship = ship;
+//     }
+// }
 
 // class Ship {
 //     cellWidgets: Cell;
@@ -62,7 +62,6 @@ export default class BattleField {
     isAuto: boolean;
     initShip: Ship;
     allShips: Ship[];
-    waitUser: boolean;
     // autoInit: boolean;
     // cellWidgets: any;
 

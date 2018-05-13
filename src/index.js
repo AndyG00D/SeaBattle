@@ -1,6 +1,9 @@
 import './css/style.css';
-// import Finder from './js/finder';
-import Canvasfield from './js/canvas';
+// import './js/main';
+// import './js/canvas.ts';
+// import BattleField from './js/battleField';
+import Canvasfield from './js/canvas.ts';
+
 // import BattleField from './js/battleField.ts';
 // import Node from './node';
 
@@ -30,10 +33,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const cell = currentCanvas.getPointerPosition(e);
     // currentCanvas.changeField(...cell);
     currentCanvas.drawfield();
-    currentCanvas.drawMove(...cell);
+    currentCanvas.drawMove(cell[0], cell[1]);
   }
 
-  function toggleVertical(e) {
+  function toggleVertical() {
     currentCanvas.initShip.isVertical = !currentCanvas.initShip.isVertical;
     return false;
   }
@@ -58,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
     currentCanvas = new Canvasfield(fieldWidth, fieldHeight, 600, 600, 'field-block');
     // currentCanvas.canvas.onclick = currentCanvas.moveField;
     currentCanvas.createEmptyField();
-    currentCanvas.drawfield(currentCanvas.field);
+    currentCanvas.drawfield();
     // currentCanvas.drawMove(1, 1);
   }
 
