@@ -1,54 +1,35 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-// const ExtractTextPlugin = require('extract-text-webpack-plugin');
-const webpack = require('webpack');
 
 module.exports = {
-  entry: {
-    index: './src/index.js',
-    test: './src/index.ts',
-  },
-  mode: 'development',
-  devtool: 'eval',
+  entry: [
+    './src/index.ts',
+  ],
+  devtool: 'inline-source-map',
   output: {
     path: `${__dirname}/dist`,
     publicPath: '/',
-    filename: '[name].js',
+    filename: 'bundle.js',
   },
-
   devServer: {
     contentBase: ['./dist', './src'],
-    port: 3030,
-    host: '0.0.0.0',
+    port: 3040,
+    host: '127.0.0.1', // host изменен под виндоус, если поменять обратно на *0.0.0.0*, будет работать на линукс
   },
   module: {
     rules: [
-      {
-        enforce: 'pre',
-        test: /\.js$/,
-        exclude: /node_modules/,
-        loader: 'eslint-loader',
-      },
+
       {
         test: /\.(js)$/,
         exclude: /node_modules/,
-        use: ['' +
-                    'babel-loader',
-        'eslint-loader',
-        ],
+        use: ['babel-loader'],
+
       },
       {
-        test: /\.tsx?$/,
-        use: 'ts-loader',
-        exclude: /node_modules/,
-      },
-      {
-        test: /\.(css|scss)$/,
+        test: /\.css$/,
         use: [{
           loader: 'style-loader', // creates style nodes from JS strings
         }, {
           loader: 'css-loader', // translates CSS into CommonJS
-        }, {
-          loader: 'sass-loader', // compiles Sass to CSS
         }],
       },
       {
@@ -61,6 +42,12 @@ module.exports = {
         ],
       },
       {
+        test: /\.tsx?$/,
+        use: 'ts-loader',
+
+        exclude: /node_modules/,
+      },
+      {
         test: /\.(woff|woff2|eot|ttf|otf)$/,
         use: [
           'file-loader',
@@ -69,18 +56,13 @@ module.exports = {
     ],
   },
   resolve: {
-    extensions: ['*', '.js', 'ts', 'tsx'],
+    modules: ['node_modules'],
+    extensions: ['*', '.js', '.tsx', '.ts'],
   },
   plugins: [
     new HtmlWebpackPlugin({
       title: 'Webpack Example',
       template: './src/index.html',
-      filename: 'index.html',
-      chunks: ['index'],
-    }),
-    new webpack.ProvidePlugin({
-      $: 'jquery',
-      jQuery: 'jquery',
     }),
   ],
 };

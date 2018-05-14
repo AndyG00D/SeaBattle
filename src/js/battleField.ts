@@ -1,28 +1,5 @@
-//Class of cell Position
-class Pos {
-    x: number;
-    y: number;
-
-    constructor(x: number = 0, y: number = 0) {
-        this.x = x;
-        this.y = y;
-    }
-}
-
-//Class contained parameters of ship
-class Ship {
-    length: number;
-    isPlaced: boolean;
-    isVertical: boolean;
-    x: number;
-    y: number;
-
-    constructor(length: number) {
-        this.length = length;
-        this.isPlaced = false;
-        this.isVertical = false;
-    }
-}
+import Position from './position';
+import Ship from './ship';
 
 //class generate field, ships and placed it
 export default class BattleField {
@@ -108,12 +85,10 @@ export default class BattleField {
         if (!this.isShipsInArea() && !isOutField) {
 
             if (this.initShip.isVertical) {
-
                     for (let i = this.initShip.y; i < (this.initShip.y + this.initShip.length); i++) {
                         this.field[this.initShip.x][i] = 1;
                     }
             } else { // horizontal
-
                     for (let i = this.initShip.x; i < (this.initShip.x + this.initShip.length); i++) {
                         this.field[i][this.initShip.y] = 1;
                     }
@@ -132,12 +107,12 @@ export default class BattleField {
     //Area around placing ship has other ships
     isShipsInArea(): boolean {
         //position of area around ship
-        let topLeftPos: Pos = new Pos(this.initShip.x - 1, this.initShip.y - 1);
-        let bottomRightPos: Pos;
+        let topLeftPos: Position = new Position(this.initShip.x - 1, this.initShip.y - 1);
+        let bottomRightPos: Position;
         if (this.initShip.isVertical) {
-            bottomRightPos = new Pos(this.initShip.x + 1, this.initShip.y + this.initShip.length);
+            bottomRightPos = new Position(this.initShip.x + 1, this.initShip.y + this.initShip.length);
         } else {
-            bottomRightPos = new Pos(this.initShip.x + this.initShip.length, this.initShip.y + 1);
+            bottomRightPos = new Position(this.initShip.x + this.initShip.length, this.initShip.y + 1);
         }
 
         //cut part of area if it out edge of field
@@ -159,9 +134,5 @@ export default class BattleField {
         if (point < 0) return 0;
         if (point > length - 1)  return length - 1;
         return point;
-    }
-
-    changeField(x: number, y: number): void {
-        this.field[x][y] = +!this.field[x][y];
     }
 }
