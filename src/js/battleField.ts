@@ -1,9 +1,4 @@
-/**
- * Позиция на поле
- * @param x позиция по оси Х
- * @param y позиция по оси У
- * @constructor
- */
+//Class of cell Position
 class Pos {
     x: number;
     y: number;
@@ -14,256 +9,135 @@ class Pos {
     }
 }
 
-/**
- * Ячейка в поле
- * @param pos позиция ячейки
- * @param ship корабль, который установлен на ячейку
- * @constructor
- */
-class Cell {
-    pos: Pos;
-    ship: any;
-
-    constructor(pos: Pos, ship: any) {
-        this.pos = pos;
-        this.ship = ship;
-    }
-}
-
-// class Ship {
-//     cellWidgets: Cell;
-//     constructor(){
-//         this.cellWidgets = new Cell([],);
-//     }
-// }
-
-
-class Ship{
-    // id: number;
+//Class contained parameters of ship
+class Ship {
     length: number;
     isPlaced: boolean;
     isVertical: boolean;
     x: number;
     y: number;
-    constructor(/*id:number,*/ length:number){
-        // this.id = id;
+
+    constructor(length: number) {
         this.length = length;
         this.isPlaced = false;
         this.isVertical = false;
     }
 }
 
-
+//class generate field, ships and placed it
 export default class BattleField {
     fieldWidth: number;
     fieldHeight: number;
-    ships: number[];
+    shipTypes: number[];
     field: number[][];
-    isAuto: boolean;
     initShip: Ship;
     allShips: Ship[];
-    waitUser: boolean;
-    // autoInit: boolean;
-    // cellWidgets: any;
-
+    allPlaced: boolean;
 
     constructor(fieldWidth = 10, fieldHeight = 10) {
         this.fieldWidth = fieldWidth;
         this.fieldHeight = fieldHeight;
-        this.ships = [0, 4, 3, 2, 1];
-        // this.autoInit = false;
-        // this.initShip = new Ship();
-        this.isAuto = true;
+        this.shipTypes = [0, 4, 3, 2, 1];
         this.allShips = [];
-        // this.initShip.isVertical = false;
-        // this.cellWidgets = new Cell(new Pos(), null);
-        // this.field = [  [0,0,0,0,0,0,0,0,0,0],
-        //                 [0,0,0,0,0,0,0,0,0,0],
-        //                 [0,0,0,0,0,0,0,0,0,0],
-        //                 [0,0,0,0,0,0,0,0,0,0],
-        //                 [0,0,0,0,0,0,0,0,0,0],
-        //                 [0,0,0,0,0,0,0,0,0,0],
-        //                 [0,0,0,0,0,0,0,0,0,0],
-        //                 [0,0,0,0,0,0,0,0,0,0],
-        //                 [0,0,0,0,0,0,0,0,0,0],
-        //                 [0,0,0,0,0,0,0,0,0,0]];
-        // ];
-        // window.console.log('field: ' + this.field);
+        this.allPlaced = false;
     }
 
-
-
-
-
+    //generate empty field
     createEmptyField(): void {
         this.field = new Array(this.fieldWidth);
         for (let x: number = 0; x < this.fieldWidth; x++) {
             this.field[x] = new Array(this.fieldHeight);
             for (let y: number = 0; y < this.fieldHeight; y++) {
-                // window.console.log('x:' + x + ', y:' + y +', val:' + this.field[x][y]);
                 this.field[x][y] = 0;
-                // window.console.log('x:' + x + ', y:' + y +', val:' + this.field[x][y]);
             }
         }
-
-        // for (let x: number = 0; x < this.fieldWidth; x++) {
-        //     // this.field[x] = [];
-        //         this.field[x].fill(0,0, this.fieldHeight);
-        //     }
-        // window.console.log('field:' + this.field);
     }
 
-
-    changeField(x: number, y: number): void {
-        this.field[x][y] = +!this.field[x][y];
-    }
-
-    // ShipsInfo = {
-    //
-    //     /**
-    //      * Четырехпалубник
-    //      */
-    //     FOUR_DECKER : {LENGTH: 4, COUNT: 1},
-    //
-    //     /**
-    //      * Трехпалубник
-    //      */
-    //     THREE_DECKER : {LENGTH: 3, COUNT: 2},
-    //
-    //     /**
-    //      * Двухпалубник
-    //      */
-    //     TWO_DECKER : {LENGTH: 2, COUNT: 3},
-    //
-    //     /**
-    //      * Однопалубник
-    //      */
-    //     SINGLE_DECKER : {LENGTH: 1, COUNT: 4}
-    // }
-
-
-    /**
-     * Возвращает позиции ячеек на которых установлен корабль
-     */
-    // getPositions() {
-    //     let result = [];
-    //     for (let i = 0; i < this.cellWidgets.length; i++) {
-    //         result.push(this.cellWidgets[i].pos);
-    //     }
-    //     return result;
-    // }
-
-    /**
-     * Инициализирует ячейки поля
-     */
-    // initCells() {
-    //     for (let i = 0; i < this.fieldWidth; i++) {
-    //         for (let j = 0; j < this.fieldHeight; j++) {
-    //             let pos:Pos = new Pos(i, j);
-    //             let cell = new Cell(pos, 0);
-    //             this.cellWidgets.push(cell);
-    //         }
-    //     }
-    // }
-
-    //_________Functions for automatic generate battle field
-
-
-
-    //1. init ships
-    initShips():void {
+    // init ships
+    initShips(): void {
+        this.allPlaced = false;
         for (let i = 4; i > 0; i--) {
-            // this.initShip.length = i;
-            for (let j = 0; j < this.ships[i]; j++) {
+            for (let j = 0; j < this.shipTypes[i]; j++) {
                 this.allShips.push(new Ship(i))
-                // console.log(this.allShips[i]);
             }
         }
         this.getShip();
     }
 
-    getShip():void {
+    //Get not placed ship
+    getShip(): void {
         for (let i = 0; i < this.allShips.length; i++) {
             if (!this.allShips[i].isPlaced) {
                 this.initShip = this.allShips[i];
+                this.allPlaced = false;
                 break;
             } else {
                 this.initShip = null;
+                this.allPlaced = true;
             }
-            // alert("All ships placed");
         }
     }
 
-    // 2. Placing ships with same length
+    //Automatic placing ships
+    autoPlacingShip() {
+        while (!this.allPlaced && !this.initShip.isPlaced) {
+            this.initShip.isVertical = Math.random() > 0.5;
 
-
-    // sleep(ms) {
-    //     return new Promise(this.waitUser = (resolve) => setTimeout(resolve, ms));
-    // }
-
-        autoPlacingShip(){
-
-            while (!!this.initShip && !this.initShip.isPlaced) {
-
-                this.initShip.isVertical = Math.random() > 0.5;
-                // find rand coordinates begin of ship
-                if (this.initShip.isVertical) {
-                    // while (y + length >= this.fieldHeight) {
-                    this.initShip.x = BattleField.randomPos(this.fieldWidth);
-                    this.initShip.y = BattleField.randomPos(this.fieldHeight - this.initShip.length);
-                    // }
-                } else { //horizontal
-                    // while (x + length >= this.fieldWidth) {
-                    this.initShip.x = BattleField.randomPos(this.fieldWidth - this.initShip.length);
-                    this.initShip.y = BattleField.randomPos(this.fieldHeight);
-                    // }
-                }
-
-                this.placingShip();
-                }
+            // find rand coordinates begin of ship
+            if (this.initShip.isVertical) {
+                this.initShip.x = BattleField.randomPos(this.fieldWidth);
+                this.initShip.y = BattleField.randomPos(this.fieldHeight - this.initShip.length);
+            } else { //horizontal
+                this.initShip.x = BattleField.randomPos(this.fieldWidth - this.initShip.length);
+                this.initShip.y = BattleField.randomPos(this.fieldHeight);
             }
 
-    // 3. Placing ship
-    placingShip(){
-            // check aria around has near ships
-            if (!this.isShipsInArea()) {
-                let shipPositions = [];
-
-                if (this.initShip.isVertical) {
-                    for (let i = this.initShip.y; i < (this.initShip.y + this.initShip.length); i++) {
-                        shipPositions.push(new Pos(this.initShip.x, i))
-                    }
-                } else { // horizontal
-                    for (let i = this.initShip.x; i < (this.initShip.x + this.initShip.length); i++) {
-                        shipPositions.push(new Pos(i, this.initShip.y));
-                    }
-                }
-
-                //mark ship on field
-
-                for (let pos of shipPositions) {
-                    this.field[pos.x][pos.y] = 1;
-                }
-
-                this.initShip.isPlaced = true;
-                this.getShip();
-            }
+            this.placingShip();
+        }
     }
 
-    //3.1 generate random position
-    static randomPos(range: number):number {
+    // Placing ship
+    placingShip() {
+        let isOutField: boolean;
+        if (this.initShip.isVertical) {
+            isOutField = (this.initShip.y + this.initShip.length) > this.fieldWidth;
+        } else {
+            isOutField = (this.initShip.x + this.initShip.length) > this.fieldHeight;
+        }
+
+        if (!this.isShipsInArea() && !isOutField) {
+
+            if (this.initShip.isVertical) {
+
+                    for (let i = this.initShip.y; i < (this.initShip.y + this.initShip.length); i++) {
+                        this.field[this.initShip.x][i] = 1;
+                    }
+            } else { // horizontal
+
+                    for (let i = this.initShip.x; i < (this.initShip.x + this.initShip.length); i++) {
+                        this.field[i][this.initShip.y] = 1;
+                    }
+            }
+
+            this.initShip.isPlaced = true;
+            this.getShip();
+        }
+    }
+
+    //Generate random position
+    static randomPos(range: number): number {
         return Math.floor(Math.random() * range);
     }
 
-    //4. Area around placing ship has other ships
+    //Area around placing ship has other ships
     isShipsInArea(): boolean {
         //position of area around ship
         let topLeftPos: Pos = new Pos(this.initShip.x - 1, this.initShip.y - 1);
         let bottomRightPos: Pos;
         if (this.initShip.isVertical) {
-            bottomRightPos = new Pos(this.initShip.x + 1, this.initShip.y + this.initShip.length + 1);
+            bottomRightPos = new Pos(this.initShip.x + 1, this.initShip.y + this.initShip.length);
         } else {
-            bottomRightPos = new Pos(this.initShip.x + this.initShip.length + 1, this.initShip.y + 1);
+            bottomRightPos = new Pos(this.initShip.x + this.initShip.length, this.initShip.y + 1);
         }
 
         //cut part of area if it out edge of field
@@ -272,64 +146,22 @@ export default class BattleField {
         bottomRightPos.x = this.cutAreaOutField(bottomRightPos.x, this.fieldWidth);
         bottomRightPos.y = this.cutAreaOutField(bottomRightPos.y, this.fieldHeight);
 
-        // window.console.log('field: ' + this.field);
-
         for (let i = topLeftPos.x; i <= bottomRightPos.x; i++) {
             for (let j = topLeftPos.y; j <= bottomRightPos.y; j++) {
-                // let cell = this.getCellByPosition(new Pos(i, j));
-                // if (cell && cell.ship) {
-                //     isShipExistInArea = true;
-                //     break;
-                // window.console.log('x:' + i + ', y:' + j + ' val: ' + this.field[i][j]);
                 if (this.field[i][j] == 1) return true;
             }
         }
         return false;
     }
 
-    // 4.1 cut side of area if it out edge of field
+    //Cut side of area if it out edge of field
     cutAreaOutField(point: number, length: number) {
         if (point < 0) return 0;
-        if (point > length-1) {
-            return length - 1;
-        }
+        if (point > length - 1)  return length - 1;
         return point;
     }
 
-
-    // setCellFired(pos:Pos) {
-    //     let cell = this.getCellByPosition(pos);
-    //     if (cell) {
-    //         cell.isFired = true;
-    //     }
-    // }
-
-    // /**
-    //  * Возвращает корабль котор. находится на переданной позиции
-    //  * @param pos позиция корабля
-    //  * @returns {*}
-    //  */
-    // getShipByPosition(pos:Pos) {
-    //     let cell = this.getCellByPosition(pos);
-    //     return cell.ship;
-    // }
-
-    // /**
-    //  * Возвращает ячейку по переданной позиции
-    //  * @param pos позиция
-    //  * @returns {null}
-    //  */
-    // getCellByPosition(pos:Pos) {
-    //     let result = null;
-    //
-    //     for (let i = 0; i < this.cellWidgets.length; i++) {
-    //         let cell = this.cellWidgets[i];
-    //         if (cell.pos.x == pos.x && cell.pos.y == pos.y) {
-    //             result = cell;
-    //             break;
-    //         }
-    //     }
-    //     return result;
-    // }
-
+    changeField(x: number, y: number): void {
+        this.field[x][y] = +!this.field[x][y];
+    }
 }

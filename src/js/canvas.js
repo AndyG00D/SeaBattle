@@ -3,7 +3,7 @@ import BattleField from './battleField.ts';
 // const fieldClick = function () {
 // };
 
-export default class Canvasfield extends BattleField {
+export default class CanvasField extends BattleField {
   constructor(fieldWidth = 10, fieldHeight = 10, width = 600, height = 600, elem = 'field-block') {
     super(fieldWidth, fieldHeight);
 
@@ -12,13 +12,7 @@ export default class Canvasfield extends BattleField {
     this.canvas = document.getElementById(elem);
     this.canvas.width = width;
     this.canvas.height = height;
-    // this.canvas.addEventListener('mousemove', this.fieldClick, false);
-    // if (!this.canvas) alert('Canvas ERROR!');
     this.ctx = this.canvas.getContext('2d');
-    // if (!this.ctx) alert('Canvas ERROR!');
-
-
-    // this.canvas.onclick = this.fieldClick;
   }
 
   drawfield() {
@@ -54,20 +48,6 @@ export default class Canvasfield extends BattleField {
       }
     }
   }
-  // // draw the path
-  // drawMove(x, y) {
-  //   // console.log(`Current path length: ${currentPath.length}`);
-  //   // console.log(`Current path: ${currentPath}`);
-  //   this.ctx.fillRect = '#7f7f7f';
-  //   this.ctx.fillRect(x * this.tileWidth, y * this.tileHeight, this.tileWidth, this.tileHeight);
-  //   // if (isVertical) {
-  //   //   this.ctx.fillRect = '#7f7f7f';
-  //   //   this.ctx.fillRect(pos.x * this.tileWidth, (pos.y + length) * this.tileHeight, this.tileWidth, this.tileHeight);
-  //   // } else {
-  //   //   this.ctx.fillRect = '#7f7f7f';
-  //   //   this.ctx.fillRect((pos.x + length) * this.tileWidth, pos.y * this.tileHeight, this.tileWidth, this.tileHeight);
-  //   // }
-  // }
 
   redraw() {
     // console.log('redrawing...');
@@ -106,9 +86,4 @@ export default class Canvasfield extends BattleField {
     return cell;
   }
 
-  // fieldClick(e) {
-  //   const cell = this.getPointerPosition(e);
-  //   this.changeField(...cell);
-  //   this.drawfield();
-  // }
 }
