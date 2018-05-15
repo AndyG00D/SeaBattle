@@ -1,5 +1,6 @@
 import BattleField from "./battleField";
 
+//class display on canvas field, ships and get position of pointer
 export default class CanvasField extends BattleField {
 
     tileWidth: number;
@@ -7,7 +8,12 @@ export default class CanvasField extends BattleField {
     canvas: any;
     ctx: CanvasRenderingContext2D;
 
-    constructor(fieldWidth: number = 10, fieldHeight: number = 10, width: number = 600, height: number = 600, elem: string = 'field-block') {
+    constructor(fieldWidth: number = 10,
+                fieldHeight: number = 10,
+                width: number = 600,
+                height: number = 600,
+                elem: string = 'field-block') {
+
         super(fieldWidth, fieldHeight);
 
         this.tileWidth = width / fieldWidth;
@@ -18,7 +24,8 @@ export default class CanvasField extends BattleField {
         this.ctx = this.canvas.getContext('2d');
     }
 
-    drawField() {
+    //display on canvas field with ships
+    drawField():void {
         let x, y: number;
         for (x = 0; x < this.field[0].length; x++) {
             for (y = 0; y < this.field.length; y++) {
@@ -37,7 +44,8 @@ export default class CanvasField extends BattleField {
         }
     }
 
-    drawMovingShip(x: number, y: number) {
+    //display on canvas moving ship
+    drawMovingShip(x: number, y: number):void {
         if (this.initShip.isVertical) {
             for (let i = y; i < y + this.initShip.length; i++) {
                 this.ctx.fillStyle = '#7f7f7f';
@@ -51,7 +59,8 @@ export default class CanvasField extends BattleField {
         }
     }
 
-    getPointerPosition(e: DragEvent) {
+    //get position of pointer
+    getPointerPosition(e: DragEvent):number[] {
         let x;
         let y;
 

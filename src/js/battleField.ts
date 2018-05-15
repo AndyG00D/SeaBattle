@@ -56,7 +56,7 @@ export default class BattleField {
     }
 
     //Automatic placing ships
-    autoPlacingShip() {
+    autoPlacingShip(): void {
         while (!this.allPlaced && !this.initShip.isPlaced) {
             this.initShip.isVertical = Math.random() > 0.5;
 
@@ -74,7 +74,7 @@ export default class BattleField {
     }
 
     // Placing ship
-    placingShip() {
+    placingShip(): void {
         let isOutField: boolean;
         if (this.initShip.isVertical) {
             isOutField = (this.initShip.y + this.initShip.length) > this.fieldWidth;
@@ -85,13 +85,13 @@ export default class BattleField {
         if (!this.isShipsInArea() && !isOutField) {
 
             if (this.initShip.isVertical) {
-                    for (let i = this.initShip.y; i < (this.initShip.y + this.initShip.length); i++) {
-                        this.field[this.initShip.x][i] = 1;
-                    }
+                for (let i = this.initShip.y; i < (this.initShip.y + this.initShip.length); i++) {
+                    this.field[this.initShip.x][i] = 1;
+                }
             } else { // horizontal
-                    for (let i = this.initShip.x; i < (this.initShip.x + this.initShip.length); i++) {
-                        this.field[i][this.initShip.y] = 1;
-                    }
+                for (let i = this.initShip.x; i < (this.initShip.x + this.initShip.length); i++) {
+                    this.field[i][this.initShip.y] = 1;
+                }
             }
 
             this.initShip.isPlaced = true;
@@ -130,9 +130,9 @@ export default class BattleField {
     }
 
     //Cut side of area if it out edge of field
-    cutAreaOutField(point: number, length: number) {
+    cutAreaOutField(point: number, length: number): number {
         if (point < 0) return 0;
-        if (point > length - 1)  return length - 1;
+        if (point > length - 1) return length - 1;
         return point;
     }
 }

@@ -4,7 +4,7 @@ module.exports = {
   entry: [
     './src/index.ts',
   ],
-  devtool: 'inline-source-map',
+  devtool: 'eval',
   output: {
     path: `${__dirname}/dist`,
     publicPath: '/',
@@ -13,7 +13,7 @@ module.exports = {
   devServer: {
     contentBase: ['./dist', './src'],
     port: 3040,
-    host: '127.0.0.1', // host изменен под виндоус, если поменять обратно на *0.0.0.0*, будет работать на линукс
+    host: '0.0.0.0',
   },
   module: {
     rules: [

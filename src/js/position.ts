@@ -1,4 +1,4 @@
-//Class of cell Position
+//Class of cell position
 export default class Position {
     x: number;
     y: number;

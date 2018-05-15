@@ -6,20 +6,6 @@ body {
     background-color: #000;
 }
 
-.wrapper {
-    display: flex;
-    flex-flow: column nowrap;
-    justify-content: stretch;
-    align-items: stretch;
-    width: 600px;
-    margin: 0 auto;
-}
-
-.canvas {
-    padding: 0;
-    margin: 0;
-}
-
 div {
     font-size: 20px;
     line-height: 30px;
@@ -32,4 +18,26 @@ input {
     text-align: center;
     height: 30px;
     background: #fff;
+}
+
+.wrapper {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: stretch;
+    align-items: stretch;
+    width: 500px;
+    margin: 0 auto;
+}
+
+.canvas {
+    padding: 0;
+    margin: 0;
+}
+
+.info{
+    display: block;
+}
+
+.hide{
+    display: none;
 }

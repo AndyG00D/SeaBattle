@@ -1,69 +1,53 @@
 import './css/style.css';
-import CanvasField from './js/canvasField';
+import UserField from './js/userField';
 
 // the html page is ready
 document.addEventListener('DOMContentLoaded', () => {
-    let userField: CanvasField = null;
+    let currentField: UserField = null;
     const fieldWidth:number = 10;
     const fieldHeight:number = 10;
+    const width: number = 500;
+    const height: number = 500;
+    const idOfElem: string = 'field-block';
+    const info = document.getElementsByClassName('info')[0];
 
+    //event on loading html page
+    function onLoad() {
+        currentField = new UserField(fieldWidth, fieldHeight, width, height, idOfElem);
+        currentField.createEmptyField();
+        currentField.drawField();
 
-    function onload() {
-        userField = new CanvasField(fieldWidth, fieldHeight, 600, 600, 'field-block');
-        userField.createEmptyField();
-        userField.drawField();
+        document.getElementsByClassName('clear-btn')[0].addEventListener('click', clickManual, false);
+        document.getElementsByClassName('generate-btn')[0].addEventListener('click', clickAuto, true);
+
+        info.classList.add('hide');
     }
 
-    // handle click events on the canvas
-    function moveField(e: DragEvent) {
-        if (!userField.allPlaced) {
-            const [x, y] = userField.getPointerPosition(e);
-            userField.drawField();
-            userField.drawMovingShip(x, y);
-        }
-    }
-
-    function toggleVertical() {
-        userField.initShip.isVertical = !userField.initShip.isVertical;
-        return false;
-    }
-
-    function clickField(e: DragEvent) {
-        if (!userField.allPlaced) {
-            const [x, y] = userField.getPointerPosition(e);
-            userField.initShip.x = x;
-            userField.initShip.y = y;
-            userField.placingShip();
-            userField.drawField();
-        }
-    }
-
-    // generate new empty field
+    //event click Manual
     function clickManual() {
-        userField.canvas.onmousemove = moveField;
-        userField.canvas.oncontextmenu = toggleVertical;
-        userField.canvas.onclick = clickField;
+        currentField.canvas.onmousemove = currentField.moveField.bind(currentField);
+        currentField.canvas.oncontextmenu = currentField.toggleVertical.bind(currentField);
+        currentField.canvas.onclick = currentField.clickField.bind(currentField);
 
-        userField.createEmptyField();
-        userField.initShips();
-        userField.drawField();
+        info.classList.remove('hide');
+
+        currentField.manual();
     }
 
-    function clickGenerate() {
-        userField.canvas.onmousemove = null;
-        userField.canvas.oncontextmenu = null;
-        userField.canvas.onclick = null;
+    //event click Auto
+    function clickAuto() {
+        currentField.auto();
 
-        userField.createEmptyField();
-        userField.initShips();
-        userField.autoPlacingShip();
-        userField.drawField();
+        currentField.canvas.onmousemove = null;
+        currentField.canvas.oncontextmenu = null;
+        currentField.canvas.onclick = null;
+
+        info.classList.add('hide');
+
+
     }
 
     // start running app
-    onload();
+    onLoad();
 
-    // events-------------------------------
-    document.getElementsByClassName('clear-btn')[0].addEventListener('click', clickManual);
-    document.getElementsByClassName('generate-btn')[0].addEventListener('click', clickGenerate);
 });
